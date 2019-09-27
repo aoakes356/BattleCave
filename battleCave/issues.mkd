@@ -10,6 +10,14 @@
 - **[8]** Use fully specified resource path, preload resources if possible
 
 ## Open Issues ##
-- **[9]** Diagram the code, update the issues document with issues
-          based on the results of the diagramming.
- 
+- **[9]**   Diagram the code, update the issues document with issues
+            based on the results of the diagramming.
+
+PHASE 1 Grid
+- **[10]**  Create a basic level for a grid to be displayed on.
+- **[11]**  Create the physics class for use in game objects.
+- **[12]**  Create the game object class. implement collisions?
+- **[13]**  Create the block class. extend game object.
+- **[14]**  Create the grid class.
+- **[15]**  Implement block gravity logic.
+- **[16]**  Implement mouse interaction with the grid.

@@ -52,6 +52,7 @@ public class BounceGame extends StateBasedGame {
 	public static final String STARTUP_BANNER_RSC = "battleCave/resource/PressSpace.png";
 	public static final String BANG_EXPLOSIONIMG_RSC = "battleCave/resource/explosion.png";
 	public static final String BANG_EXPLOSIONSND_RSC = "battleCave/resource/explosion.wav";
+	public static final String SIMPLE_LEVEL_RSC = "battleCave/resource/simpleLevel.png";
 
 	public final int ScreenWidth;
 	public final int ScreenHeight;
@@ -95,6 +96,7 @@ public class BounceGame extends StateBasedGame {
 
 		// preload all the resources to avoid warnings & minimize latency...
 		ResourceManager.loadImage(BALL_BALLIMG_RSC);
+    ResourceManager.loadImage(SIMPLE_LEVEL_RSC);
 		ResourceManager.loadImage(BALL_BROKENIMG_RSC);
 		ResourceManager.loadImage(GAMEOVER_BANNER_RSC);
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
@@ -107,8 +109,8 @@ public class BounceGame extends StateBasedGame {
 	public static void main(String[] args) {
 		AppGameContainer app;
 		try {
-			app = new AppGameContainer(new BounceGame("Bounce!", 800, 600));
-			app.setDisplayMode(800, 600, false);
+			app = new AppGameContainer(new BounceGame("Bounce!", 1600, 800));
+			app.setDisplayMode(1600, 800, false);
 			app.setVSync(true);
 			app.start();
 		} catch (SlickException e) {
