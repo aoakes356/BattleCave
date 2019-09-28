@@ -19,6 +19,6 @@ public class Ground extends GameObject {
 
   @Override
   public void update(int delta){
-
+    super.update(delta);
   }
 }

@@ -8,9 +8,11 @@ import org.newdawn.slick.Graphics;
 
 public class GameObject extends Entity {
   public static final int GAMEOBJ_ID = 0;
+  public  Physics physics;
 
   public GameObject(final float x, final float y){
     super(x,y);
+    physics = new Physics(x,y,1.0f);
   }
 
   @Override
@@ -19,7 +21,7 @@ public class GameObject extends Entity {
   }
 
   public void update(int delta){
-
+    physics.update(delta);
   }
 
   public Vector collision(GameObject g_obj){
