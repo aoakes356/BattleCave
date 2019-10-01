@@ -39,9 +39,9 @@ class PlayingState extends BasicGameState {
 	public void render(GameContainer container, StateBasedGame game,
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
-	  Ground ground = new Ground(bg.ScreenWidth/2.0f,bg.ScreenHeight-25);
 		bg.ball.render(g);
-		ground.render(g);
+		bg.block.render(g);
+		bg.ground.render(g);
 		g.drawString("Bounces: " + bounces, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
@@ -53,6 +53,9 @@ class PlayingState extends BasicGameState {
 
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
+		bg.block.collision(bg.ground);
+		bg.block.update(delta);
+		bg.ball.update(delta);
 		
 
 	}

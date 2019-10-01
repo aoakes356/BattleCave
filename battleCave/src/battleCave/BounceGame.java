@@ -53,11 +53,14 @@ public class BounceGame extends StateBasedGame {
 	public static final String BANG_EXPLOSIONIMG_RSC = "battleCave/resource/explosion.png";
 	public static final String BANG_EXPLOSIONSND_RSC = "battleCave/resource/explosion.wav";
 	public static final String GROUND_RSC = "battleCave/resource/ground.png";
+	public static final String BASIC_BLOCK_RSC = "battleCave/resource/simpleBlock.png";
 
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 
 	Ball ball;
+	public Ground ground;
+	public Block block;
 	ArrayList<Bang> explosions;
 
 	/**
@@ -101,9 +104,11 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(GAMEOVER_BANNER_RSC);
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
+		ResourceManager.loadImage(BASIC_BLOCK_RSC);
 
+		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-25);
 		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .1f, .2f);
-
+    block = new Block(ScreenWidth/3, ScreenHeight/3);
 	}
 
 	public static void main(String[] args) {

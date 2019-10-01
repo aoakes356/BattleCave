@@ -15,9 +15,9 @@
 - **[10]**  Create a basic level for a grid to be displayed on.
 - **[11]**  Create the physics class for use in game objects.
 - **[12]**  Create the game object class. implement collisions?
+- **[13]**  Create the block class. extend game object.
 
 PHASE 1 Grid
-- **[13]**  Create the block class. extend game object.
 - **[14]**  Create the grid class.
 - **[15]**  Implement block gravity logic.
 - **[16]**  Implement mouse interaction with the grid.

@@ -42,9 +42,14 @@ public class PhysVector {
   public float dot(float x, float y){
     return this.x * x + this.y * y;
   }
-  public void scale(float scalar){
+  public PhysVector scale(float scalar){
     this.x *= scalar;
     this.y *= scalar;
+    return this;
+  }
+
+  public float length(){
+    return (float)Math.sqrt(x*x+y*y);
   }
 
   public PhysVector cloneVec(){

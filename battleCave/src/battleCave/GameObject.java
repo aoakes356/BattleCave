@@ -22,14 +22,18 @@ public class GameObject extends Entity {
 
   public void update(int delta){
     physics.update(delta);
+    PhysVector v = physics.velocity;
+    super.setPosition(getPosition().getX()+v.x*delta,getPosition().getY()+v.y*delta);
   }
 
-  public Vector collision(GameObject g_obj){
+
+  public void collision(GameObject g_obj){
     Collision c = collides(g_obj);
     if(c != null) {
-      return c.getMinPenetration();
-    }else{
-      return new Vector(0,0);
+      while(c != null){
+        translate(c.getMinPenetration().scale(.1f));
+        c = collides(g_obj);
+      }
     }
   }
 

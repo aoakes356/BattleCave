@@ -1,6 +1,7 @@
 package battleCave;
 
 import jig.ResourceManager;
+import jig.Vector;
 import org.newdawn.slick.Graphics;
 
 public class Ground extends GameObject {
@@ -21,4 +22,9 @@ public class Ground extends GameObject {
   public void update(int delta){
     super.update(delta);
   }
+
+  public void collision(GameObject g){
+    super.collision(g);
+  }
+
 }
