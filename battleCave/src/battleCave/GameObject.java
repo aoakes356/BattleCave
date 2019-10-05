@@ -8,6 +8,8 @@ import org.newdawn.slick.Graphics;
 
 public class GameObject extends Entity {
   public static final int GAMEOBJ_ID = 0;
+  public static final int GROUND_ID = 1;
+  public static final int BLOCK_ID = 2;
   public  Physics physics;
 
   public GameObject(final float x, final float y){
@@ -31,7 +33,7 @@ public class GameObject extends Entity {
     Collision c = collides(g_obj);
     if(c != null) {
       while(c != null){
-        translate(c.getMinPenetration().scale(.1f));
+        translate(c.getMinPenetration().scale(.5f));
         c = collides(g_obj);
       }
     }

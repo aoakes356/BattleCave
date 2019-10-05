@@ -27,4 +27,9 @@ public class Ground extends GameObject {
     super.collision(g);
   }
 
+  @Override
+  public int get_id(){
+    return GameObject.GROUND_ID;
+  }
+
 }

@@ -7,8 +7,11 @@ import jig.ResourceManager;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
+
+import javax.swing.*;
 
 /**
  * A Simple Game of Bounce.
@@ -61,6 +64,7 @@ public class BounceGame extends StateBasedGame {
 	Ball ball;
 	public Ground ground;
 	public Block block;
+	public Grid grid;
 	ArrayList<Bang> explosions;
 
 	/**
@@ -105,7 +109,7 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(STARTUP_BANNER_RSC);
 		ResourceManager.loadImage(BANG_EXPLOSIONIMG_RSC);
 		ResourceManager.loadImage(BASIC_BLOCK_RSC);
-
+    grid = new Grid(this);
 		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-25);
 		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .1f, .2f);
     block = new Block(ScreenWidth/3, ScreenHeight/3);
