@@ -48,7 +48,6 @@ class PlayingState extends BasicGameState {
   @Override
   public void mouseClicked(int button, int x, int y, int clickCount) {
     super.mouseClicked(button, x, y, clickCount);
-    System.out.println(""+x+y+button);
     if(g != null){
       g.clickHandler(new Vector(x,y), button);
     }

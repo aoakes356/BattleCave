@@ -43,13 +43,15 @@ public class Grid {
         temp = (this.blocks.get(i)).get(j);
         if(temp != null) {
           collision(temp);
+          if(temp.grounded){
+            findNeighbors(temp);
+          }
         }
       }
     }
   }
 
   public void collision(GameObject obj){
-    System.out.println("Checking for collision");
     if(obj.get_id() == GameObject.BLOCK_ID){
       Block temp = (Block)obj;
       if(!temp.getActive()){
@@ -94,6 +96,7 @@ public class Grid {
 
   public void update(int delta){
     Block temp;
+    ArrayList<Block> updated = new ArrayList<>();
     for(int i = 0; i < this.blocks.size(); i++){
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
@@ -120,9 +123,13 @@ public class Grid {
   }
 
   public void clickHandler(Vector e, int button){
-    System.out.println("Activating block!");
+    System.out.println("Activating block! "+button);
     e = mapCoord(e.getX(),e.getY());
-    activateBlock((int)e.getX(),(int)e.getY());
+    if(button == 1) {
+      activateBlock((int) e.getX(), (int) e.getY());
+    }else if(button == 0){
+      destroyBlock((int) e.getX(), (int) e.getY());
+    }
 
   }
 
@@ -157,8 +164,117 @@ public class Grid {
     if(temp != null){
 
     }else{
-      this.blocks.get(x).set(y,new Block(x,y,100));
+      Block nblock = new Block(x,y,100);
+      this.blocks.get(x).set(y,nblock);
       this.blocks.get(x).get(y).setActive(true);
+      findNeighbors(nblock);
     }
+  }
+
+  public void findNeighbors(Block nblock){
+    int x = nblock.gridX;
+    int y = nblock.gridY;
+    Block up, down, left, right;
+    if(x > 0) {
+      left = blocks.get(x - 1).get(y);
+    }else {
+      left = null;
+    }if(x < blocks.size()-1) {
+      right = blocks.get(x + 1).get(y);
+    }else {
+      right = null;
+    }if(y > 0) {
+      up = blocks.get(x).get(y - 1);
+    }else {
+      up = null;
+    }if(y < blocks.get(x).size()-1) {
+      down = blocks.get(x).get(y + 1);
+    }else {
+      down = null;
+    }
+    if(left != null && left.grounded) {
+      nblock.grounded = true;
+      nblock.isStatic = true;
+    }else if(right != null && right.grounded) {
+      nblock.grounded = true;
+      nblock.isStatic = true;
+    }else if(up != null && up.grounded) {
+      nblock.grounded = true;
+      nblock.isStatic = true;
+    }else if(down != null && down.grounded) {
+      nblock.grounded = true;
+      nblock.isStatic = true;
+    }
+    nblock.left = left;
+    nblock.right = right;
+    nblock.above = up;
+    nblock.below = down;
+  }
+
+  public static boolean isRooted(Block b, ArrayList<Block> visited){
+    if(b == null){return false;}
+    boolean u,d,l,r;
+    visited.add(b);
+    if(b.rooted){
+      b.grounded = true;
+      System.out.println("The Root has been found!");
+      return true;
+    }else{
+      if(b.below != null && !visited.contains(b.below)){
+        d = isRooted(b.below,visited);
+        b.gridY = b.below.gridY-1;
+      }else{
+        d = false;
+      }if(b.above != null && !visited.contains(b.above)){
+        u = isRooted(b.above, visited);
+        b.gridY = b.above.gridY+1;
+      }else{
+        u = false;
+      }if(b.left != null && !visited.contains(b.left)){
+        l = isRooted(b.left, visited);
+        b.gridY =  b.left.gridY;
+      }else{
+        l = false;
+      }if(b.right != null && !visited.contains(b.right)){
+        r = isRooted(b.right, visited);
+        b.gridY = b.right.gridY;
+      }else{
+        r = false;
+      }
+      b.grounded = d||u||l||r;
+      b.isStatic = b.grounded;
+      b.setPosition(Grid.coordMap(b.gridX, b.gridY));
+      return b.grounded;
+    }
+  }
+
+  public void destroyBlock(int x, int y){
+    Block start = blocks.get(x).get(y);
+    if(start != null){
+      ArrayList<Block> visited = new ArrayList<>();
+      if(start.above != null) {
+        start.above.below = null;
+      }if(start.below != null) {
+        start.below.above = null;
+      }if(start.left != null) {
+        start.left.right = null;
+      }if(start.right != null) {
+        start.right.left = null;
+      }
+      boolean u = isRooted(start.above, visited);
+      boolean d = isRooted(start.below, visited);
+      boolean l = isRooted(start.left, visited);
+      boolean r = isRooted(start.right, visited);
+      if(u){System.out.println("Up is rooted.");}
+      if(d){System.out.println("Down is rooted.");}
+      if(l){System.out.println("Left is rooted.");}
+      if(r){System.out.println("Right is rooted.");}
+      if(!(u&&d&&l&&r)){
+        System.out.println("Nothing is rooted!!!");
+      }
+    }else{
+      System.out.println("Block that you wish to destroy is null");
+    }
+    blocks.get(x).set(y,null);
   }
 }
