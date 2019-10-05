@@ -18,7 +18,5 @@
 - **[13]**  Create the block class. extend game object.
 
 PHASE 1 Grid
-- **[14]**  Create the grid class.
-  -- Make it so when blocks move they are placed in the correct spot in the grid, and grid neighbors are updated.
 - **[15]**  Implement block gravity logic.
 - **[16]**  Implement mouse interaction with the grid.
