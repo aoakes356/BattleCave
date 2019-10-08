@@ -3,6 +3,7 @@ package battleCave;
 import jig.Collision;
 import jig.ResourceManager;
 import jig.Vector;
+import org.newdawn.slick.Game;
 import org.newdawn.slick.Graphics;
 
 import java.util.ArrayList;
@@ -18,7 +19,9 @@ public class Block extends GameObject {
   private boolean active;
   public boolean grounded;
   public boolean rooted;
+  public boolean hasCluster;
   public Block above, below, left, right;
+  public String currentImage;
   public Block(float x, float y) {
     this(x,y,100.0f);
   }
@@ -27,6 +30,7 @@ public class Block extends GameObject {
     super(x,y);
     addImageWithBoundingBox(ResourceManager
         .getImage(BounceGame.BASIC_BLOCK_RSC));
+    currentImage = BounceGame.BASIC_BLOCK_RSC;
     this.health = health;
     this.currentHealth = health;
     drag = true;
@@ -34,11 +38,13 @@ public class Block extends GameObject {
     active = false;
     grounded = false;
     rooted = false;
+    hasCluster = false;
   }
   public Block(float x, float y, float health, int gx, int gy){
     super(x,y);
     addImageWithBoundingBox(ResourceManager
         .getImage(BounceGame.BASIC_BLOCK_RSC));
+    currentImage = BounceGame.BASIC_BLOCK_RSC;
     this.health = health;
     this.currentHealth = health;
     gridX = gx;
@@ -48,6 +54,7 @@ public class Block extends GameObject {
     active = false;
     grounded =false;
     rooted = false;
+    hasCluster = false;
   }
 
   public Block(int x, int y, float health){
@@ -55,22 +62,7 @@ public class Block extends GameObject {
 
   }
 
-  public void matchNeighbors(){
-    PhysVector vel;
-    if(left != null){
-      vel = left.physics.velocity;
-      left.physics.velocity = vel.cloneVec();
-    }if(right != null){
-      vel = right.physics.velocity;
-      right.physics.velocity = vel.cloneVec();
-    }if(above != null){
-      vel = above.physics.velocity;
-      above.physics.velocity = vel.cloneVec();
-    }if(below != null){
-      vel = below.physics.velocity;
-      below.physics.velocity = vel.cloneVec();
-    }
-  }
+
 
   @Override
   public void render(Graphics g) {
@@ -82,33 +74,46 @@ public class Block extends GameObject {
   @Override
   public void update(int delta){
     if(active) {
-      super.update(delta);
       Vector pos = Grid.mapCoord(this.getX(), this.getY());
       this.gridX = (int) pos.getX();
       this.gridY = (int) pos.getY();
-      if(staticNeighbors()){
-        isStatic = true;
-        grounded = true;
-      }
-      if (isStatic) {
+      if (grounded) {
         // Keep in its grid position.
+        if(currentImage != BounceGame.STATIC_BLOCK_RSC) {
+          removeImage(ResourceManager.getImage(currentImage));
+          addImage(ResourceManager.getImage(BounceGame.STATIC_BLOCK_RSC));
+          currentImage = BounceGame.STATIC_BLOCK_RSC;
+        }
+        setGrid(Grid.mapCoord(getX(),getY()));
         setPosition(Grid.coordMap(gridX, gridY));
         super.physics.velocity.scale(0);
         super.physics.acceleration.scale(0);
         super.physics.force.scale(0);
-      } else {
-        matchNeighbors();
+      } else if(isStatic){
+        setGrid(Grid.mapCoord(getX(),getY()));
+        staticPath(this, null);
+        super.physics.velocity.scale(0);
+        super.physics.acceleration.scale(0);
+        super.physics.force.scale(0);
+      }else {
+        if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
+          removeImage(ResourceManager.getImage(currentImage));
+          addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
+          currentImage = BounceGame.BASIC_BLOCK_RSC;
+        }
+        staticPath(this,null);
         if (health <= 0) {
           active = false;
           return;
         }
-        if (!grounded) {
+        if (!grounded&&!isStatic) {
           super.physics.addAcceleration(0, .000981f);
         }
-        if (drag) {
+        if (drag&&!isStatic) {
           super.physics.addForce(super.physics.velocity.cloneVec().scale(-.0105f * super.physics.velocity.length()));
         }
       }
+      super.update(delta);
     }
   }
 
@@ -120,30 +125,55 @@ public class Block extends GameObject {
     currentHealth = health;
   }
 
-  public boolean staticNeighbors(){
-    boolean l,r,u,d;
-    if(left != null && left.grounded){
+
+  public static boolean staticNeighbors(Block b){
+    boolean l=false,r=false,u=false,d = false;
+    if(b.left != null && b.left.grounded){
       l = true;
-    }else{
-      l = false;
-    }if(right != null && right.grounded){
-      r = true;
-    }else{
-      r = false;
-    }if(above != null && above.grounded){
+    }else if(b.above != null && b.above.grounded){
       u = true;
-    }else {
-      u = false;
-    }if(below != null && below.grounded){
+    }else if(b.right != null && b.right.grounded){
+      r = true;
+    }else if(b.below != null && b.below.grounded){
       d = true;
-    }else{
-      d = false;
     }
     return l||r||u||d;
   }
 
+  public static boolean staticPath(Block b, ArrayList<Block> visited){
+    if(visited == null){
+      visited = new ArrayList<>();
+    }
+    if(b == null || visited.contains(b)){
+      return false;
+    }
+    visited.add(b);
+    boolean res = staticPath(b.left,visited)||staticPath(b.right,visited)||staticPath(b.below,visited)||staticPath(b.above,visited);
+    if(staticNeighbors(b)){
+      b.setStatic();
+      b.setGrounded();
+      return true;
+    }else{
+      if(res){
+        b.setStatic();
+        b.setGrounded();
+      }
+      return res;
+    }
+  }
+
   @Override
   public void collision(GameObject obj){
+    if(obj.get_id() == GameObject.BLOCK_ID){
+      Block b = ((Block)obj);
+      if(b.grounded){
+        b.setPosition(Grid.coordMap(b.gridX, b.gridY));
+        if(grounded){
+          setPosition(Grid.coordMap(gridX, gridY));
+          return;
+        }
+      }
+    }
     Collision c = collides(obj);
     boolean collide = true;
     if(obj != this) {
@@ -153,32 +183,34 @@ public class Block extends GameObject {
             grounded = true;
             rooted = true;
             isStatic = true;
-            Grid.isRooted(this,new ArrayList<>());
+            Vector pos = Grid.mapCoord(this.getX(), this.getY());
+            Vector gp = Grid.coordMap((int) pos.getX(), (int) pos.getY());
+            setPosition(gp.getX(), gp.getY());
           }else{
             Block b = (Block)obj;
             grounded = b.grounded;
             isStatic = b.isStatic;
-
-            if(!b.isStatic && !b.grounded){
-              collide = false;
-            }
           }
-          if(collide){
-            Vector pos = Grid.mapCoord(this.getX(), this.getY());
-            Vector gp = Grid.coordMap((int) pos.getX(), (int) pos.getY());
-            this.gridX = (int) pos.getX();
-            this.gridY = (int) pos.getY();
-            setPosition(gp.getX(), gp.getY());
-            physics.velocity.scale(0);
-            physics.force.scale(0);
-            physics.acceleration.scale(0);
-          }
-
         }
+        Block temp3;
         while (c != null) {
-
-          translate(c.getMinPenetration().scale(.5f));
-          c = collides(obj);
+          if(obj.get_id() == GameObject.BLOCK_ID){
+            temp3 = (Block)obj;
+            if(temp3.grounded && !grounded){
+              translate(c.getMinPenetration().scale(.5f));
+              c = collides(obj);
+            }else if(grounded && !temp3.grounded){
+              temp3.translate(c.getMinPenetration().scale(.5f));
+              c = collides(obj);
+            }else{
+              c = null;
+            }
+          }else if(grounded) {
+            translate(c.getMinPenetration().scale(.5f));
+            c = collides(obj);
+          }else{
+            c = null;
+          }
         }
       }
     }
@@ -189,8 +221,47 @@ public class Block extends GameObject {
     this.isStatic = false;
   }
 
+  public void setStatic(){
+    this.isStatic = true;
+  }
+  public void setChanging(){
+    this.grounded = false;
+    this.isStatic = false;
+  }
+
+  public void setGrounded(){
+    this.grounded = true;
+  }
+
   public boolean getActive(){
     return active;
+  }
+
+  public void setVelocity(float x, float y){
+    physics.velocity.setY(y);
+    physics.velocity.setX(x);
+  }
+
+  public void setGrid(int x, int y){
+    gridY = y;
+    gridX = x;
+  }
+
+  public void setGrid(Vector g){
+    gridY = (int)g.getY();
+    gridX = (int)g.getX();
+  }
+
+  public void setGridY(int y){
+    gridY = y;
+  }
+
+  public void setGridX(int x){
+    gridX = x;
+  }
+
+  public void setCluster(boolean cluster){
+    hasCluster = cluster;
   }
 
   @Override

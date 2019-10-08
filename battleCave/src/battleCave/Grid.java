@@ -6,6 +6,7 @@ import org.newdawn.slick.Graphics;
 
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Grid {
   public static final int BUILD_MODE = 0;
@@ -15,6 +16,7 @@ public class Grid {
   public int mode;
   public int width, height;
   public int widthOffset, heightOffset;
+  private ArrayList<Cluster> chunks;
   public Grid(BounceGame bg){
     blocks = new ArrayList<>();
     width = bg.ScreenWidth/40;
@@ -22,6 +24,7 @@ public class Grid {
     widthOffset = (bg.ScreenWidth%40)/2;  // Use these values to center the grid on the screen.
     heightOffset = (bg.ScreenHeight%40)/2;
     ArrayList<Block> temp;
+    chunks = new ArrayList<>();
     float x, y;
     for(int i = 0; i < width; i++){
       temp = new ArrayList<>();
@@ -38,12 +41,16 @@ public class Grid {
 
   public void collisionCheck(){  // Check for collisions internally.
     Block temp;
+    boolean save;
     for (int i = 0; i < this.blocks.size(); i++) {
       for (int j = 0; j < this.blocks.get(i).size(); j++) {
         temp = (this.blocks.get(i)).get(j);
-        if(temp != null) {
+        if(temp != null ) {
+          save = temp.grounded;
           collision(temp);
-          if(temp.grounded){
+          if(temp.grounded && !save){
+            isRooted(temp,new ArrayList<>());
+          }else if(temp.grounded){
             findNeighbors(temp);
           }
         }
@@ -107,7 +114,16 @@ public class Grid {
         }
       }
     }
-
+    for(Iterator<Cluster> i = chunks.iterator();i.hasNext();){
+      Cluster c = i.next();
+      c.update(delta);
+      if(c.isStatic){
+        i.remove();
+      }
+    }
+    if(chunks.size() > 0){
+      System.out.println("falling chunks.");
+    }
   }
 
   public void render(Graphics g){
@@ -125,10 +141,14 @@ public class Grid {
   public void clickHandler(Vector e, int button){
     System.out.println("Activating block! "+button);
     e = mapCoord(e.getX(),e.getY());
+    ArrayList<Cluster> clusters;
     if(button == 1) {
       activateBlock((int) e.getX(), (int) e.getY());
     }else if(button == 0){
-      destroyBlock((int) e.getX(), (int) e.getY());
+      clusters = destroyBlock((int) e.getX(), (int) e.getY());
+      if(clusters != null){
+        chunks.addAll(clusters);
+      }
     }
 
   }
@@ -192,18 +212,19 @@ public class Grid {
     }else {
       down = null;
     }
+    nblock.setChanging();
     if(left != null && left.grounded) {
-      nblock.grounded = true;
-      nblock.isStatic = true;
+      nblock.setStatic();
+      nblock.setGrounded();
     }else if(right != null && right.grounded) {
-      nblock.grounded = true;
-      nblock.isStatic = true;
+      nblock.setStatic();
+      nblock.setGrounded();
     }else if(up != null && up.grounded) {
-      nblock.grounded = true;
-      nblock.isStatic = true;
+      nblock.setStatic();
+      nblock.setGrounded();
     }else if(down != null && down.grounded) {
-      nblock.grounded = true;
-      nblock.isStatic = true;
+      nblock.setStatic();
+      nblock.setGrounded();
     }
     nblock.left = left;
     nblock.right = right;
@@ -222,36 +243,36 @@ public class Grid {
     }else{
       if(b.below != null && !visited.contains(b.below)){
         d = isRooted(b.below,visited);
-        b.gridY = b.below.gridY-1;
       }else{
         d = false;
       }if(b.above != null && !visited.contains(b.above)){
         u = isRooted(b.above, visited);
-        b.gridY = b.above.gridY+1;
       }else{
         u = false;
       }if(b.left != null && !visited.contains(b.left)){
         l = isRooted(b.left, visited);
-        b.gridY =  b.left.gridY;
       }else{
         l = false;
       }if(b.right != null && !visited.contains(b.right)){
         r = isRooted(b.right, visited);
-        b.gridY = b.right.gridY;
       }else{
         r = false;
       }
       b.grounded = d||u||l||r;
       b.isStatic = b.grounded;
-      b.setPosition(Grid.coordMap(b.gridX, b.gridY));
       return b.grounded;
     }
   }
 
-  public void destroyBlock(int x, int y){
+
+  public ArrayList<Cluster> destroyBlock(int x, int y){
     Block start = blocks.get(x).get(y);
+    ArrayList<Cluster> clusters = null;
     if(start != null){
-      ArrayList<Block> visited = new ArrayList<>();
+      ArrayList<Block> visitedUp = new ArrayList<>();
+      ArrayList<Block> visitedDown = new ArrayList<>();
+      ArrayList<Block> visitedLeft = new ArrayList<>();
+      ArrayList<Block> visitedRight = new ArrayList<>();
       if(start.above != null) {
         start.above.below = null;
       }if(start.below != null) {
@@ -261,20 +282,66 @@ public class Grid {
       }if(start.right != null) {
         start.right.left = null;
       }
-      boolean u = isRooted(start.above, visited);
-      boolean d = isRooted(start.below, visited);
-      boolean l = isRooted(start.left, visited);
-      boolean r = isRooted(start.right, visited);
-      if(u){System.out.println("Up is rooted.");}
-      if(d){System.out.println("Down is rooted.");}
-      if(l){System.out.println("Left is rooted.");}
-      if(r){System.out.println("Right is rooted.");}
+      boolean u = isRooted(start.above, visitedUp);
+      boolean d = isRooted(start.below, visitedDown);
+      boolean l = isRooted(start.left, visitedLeft);
+      boolean r = isRooted(start.right, visitedRight);
+      Block first;
+      clusters = new ArrayList<>();
+      if(u){
+        u = false;
+      }else{
+       u = true;
+       if(visitedUp.size() > 0){
+         first = visitedUp.get(0);
+         if(!(visitedDown.contains(first) || visitedLeft.contains(first) ||visitedRight.contains(first))){
+           clusters.add(new Cluster(visitedUp));
+         }
+       }
+      }
+      if(d){
+        d = false;
+      }else{
+        d = true;
+        if(visitedDown.size() >0 ){
+         first = visitedDown.get(0);
+          if(!(visitedLeft.contains(first) || visitedRight.contains(first) || visitedUp.contains(first))){
+            clusters.add(new Cluster(visitedDown));
+          }
+        }
+      }
+      if(l){
+        l = false;
+      }else{
+        l = true;
+        if(visitedLeft.size() > 0){
+          first = visitedLeft.get(0);
+          if(!(visitedDown.contains(first) || visitedRight.contains(first) || visitedUp.contains(first))){
+            clusters.add(new Cluster(visitedLeft));
+          }
+        }
+      }
+      if(r){
+        r = false;
+      }else{
+        r = true;
+        if(visitedRight.size() > 0){
+          first = visitedRight.get(0);
+          if(!(visitedDown.contains(first) || visitedLeft.contains(first) || visitedUp.contains(first))){
+            clusters.add(new Cluster(visitedRight));
+          }
+        }
+      }
       if(!(u&&d&&l&&r)){
         System.out.println("Nothing is rooted!!!");
       }
     }else{
       System.out.println("Block that you wish to destroy is null");
     }
+    if(clusters != null && clusters.size() == 0){
+      clusters = null;
+    }
     blocks.get(x).set(y,null);
+    return clusters;
   }
 }

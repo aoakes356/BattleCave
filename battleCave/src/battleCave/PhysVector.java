@@ -1,5 +1,7 @@
 package battleCave;
 
+import jig.Vector;
+
 public class PhysVector {
   public float x;
   public float y;
@@ -55,6 +57,15 @@ public class PhysVector {
   public PhysVector cloneVec(){
     return new PhysVector(this.x, this.y);
   }
+  public Vector vCloneVec() {
+    return new Vector(this.x, this.y);
+  }
+  public void setX(float x){
+    this.x = x;
+  }
 
+  public void setY(float y){
+    this.y = y;
+  }
 
 }
