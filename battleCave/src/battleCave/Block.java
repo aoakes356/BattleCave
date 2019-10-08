@@ -164,7 +164,7 @@ public class Block extends GameObject {
 
   @Override
   public void collision(GameObject obj){
-    if(obj.get_id() == GameObject.BLOCK_ID){
+    /*if(obj.get_id() == GameObject.BLOCK_ID){
       Block b = ((Block)obj);
       if(b.grounded){
         b.setPosition(Grid.coordMap(b.gridX, b.gridY));
@@ -173,7 +173,7 @@ public class Block extends GameObject {
           return;
         }
       }
-    }
+    }*/
     Collision c = collides(obj);
     boolean collide = true;
     if(obj != this) {
