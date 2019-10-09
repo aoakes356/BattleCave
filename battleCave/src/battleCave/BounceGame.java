@@ -115,7 +115,7 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(STATIC_BLOCK_RSC);
 		ResourceManager.loadImage(EMPTY_BLOCK_RSC);
 		ResourceManager.loadImage(EMPTYHOVER_BLOCK_RSC);
-    grid = new Grid(this);
+    grid = new Grid(this,40);
 		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-16);
 		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .1f, .2f);
     block = new Block(ScreenWidth/3, ScreenHeight/3);

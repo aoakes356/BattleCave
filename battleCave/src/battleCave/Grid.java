@@ -20,13 +20,16 @@ public class Grid {
   public static final int PRESSED = 0;
   public static final int RELEASED = 1;
   public boolean pressed;
+  public int blockSize;
   private ArrayList<Cluster> chunks;
-  public Grid(BounceGame bg){
+  public Grid(BounceGame bg,int blockSize){
+    this.blockSize = blockSize;
     blocks = new ArrayList<>();
-    width = bg.ScreenWidth/40;
-    height = bg.ScreenHeight/40;
-    widthOffset = (bg.ScreenWidth%40)/2;  // Use these values to center the grid on the screen.
-    heightOffset = (bg.ScreenHeight%40)/2;
+    mode = BATTLE_MODE;
+    width = bg.ScreenWidth/blockSize;
+    height = bg.ScreenHeight/blockSize;
+    widthOffset = (bg.ScreenWidth%blockSize)/2;  // Use these values to center the grid on the screen.
+    heightOffset = (bg.ScreenHeight%blockSize)/2;
     ArrayList<Block> temp;
     chunks = new ArrayList<>();
     pressed = false;
@@ -37,7 +40,7 @@ public class Grid {
       temp = new ArrayList<>();
       blocks.add(temp);
       for(int j = 0; j < height; j++){
-        temp.add(new EmptyBlock(coordMap(i,j)));
+        temp.add(new EmptyBlock(coordMap(i,j,blockSize)));
         blockcount++;
         /*x = i*40+20;
         y = j*40+20;
@@ -59,8 +62,8 @@ public class Grid {
         temp = j.next();
 
         if(temp != null && temp.get_id() != GameObject.EMPTY_BLOCK_ID) {
-          gridpos = mapCoord(temp.getPosition().getX(),temp.getPosition().getY());
-          if((int)gridpos.getX() >= 40 || (int)gridpos.getY() >= 20){
+          gridpos = mapCoord(temp.getPosition().getX(),temp.getPosition().getY(),blockSize);
+          if((int)gridpos.getX() >= width || (int)gridpos.getY() >= height){
             column.set(column.indexOf(temp),null);
             return;
           }
@@ -83,7 +86,7 @@ public class Grid {
         return;
       }
       Block temp2;
-      Vector gridpos = mapCoord(temp.getPosition().getX(),temp.getPosition().getY());
+      Vector gridpos = mapCoord(temp.getPosition().getX(),temp.getPosition().getY(),blockSize);
       int i = (int)gridpos.getX();
       int yRange = temp.gridY;
       int yMin, yMax;
@@ -122,20 +125,23 @@ public class Grid {
   public void update(int delta){
     Block temp;
     int previous;
-    ArrayList<Block> updated = new ArrayList<>();
     for(int i = 0; i < this.blocks.size(); i++){
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
         if(temp != null) {
           previous = temp.gridY;
           temp.update(delta);
-          if (temp.gridX < 40 && temp.gridY < 20) {
+          if (temp.gridX < width && temp.gridY < height) {
             if(previous != temp.gridY) {
-              this.blocks.get(i).set(previous, new EmptyBlock(coordMap(i, j)));
-              this.blocks.get(i).set(temp.gridY, temp);
+              if(this.blocks.get(i).get(previous) == temp && this.blocks.get(i).get(temp.gridY).get_id() == GameObject.EMPTY_BLOCK_ID) {
+                this.blocks.get(i).set(previous, new EmptyBlock(coordMap(i,j,blockSize)));
+                this.blocks.get(i).set(temp.gridY, temp);
+              }else{
+                temp.setGridY(previous);
+              }
             }
           } else {
-            blocks.get(i).set(j, new EmptyBlock(coordMap(i,j)));
+            blocks.get(i).set(j, new EmptyBlock(coordMap(i,j,blockSize)));
           }
         }
       }
@@ -158,7 +164,11 @@ public class Grid {
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
         if(temp != null) {
-          temp.render(g);
+          if(mode == BUILD_MODE) {
+            temp.render(g);
+          }else if(temp.get_id() != GameObject.EMPTY_BLOCK_ID){
+            temp.render(g);
+          }
         }
       }
     }
@@ -166,7 +176,7 @@ public class Grid {
 
   public void clickHandler(Vector e, int button){
     System.out.println("Activating block! "+button);
-    e = mapCoord(e.getX(),e.getY());
+    e = mapCoord(e.getX(),e.getY(),blockSize);
     if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
       return;
     }
@@ -182,7 +192,7 @@ public class Grid {
   }
 
   public void hover(float x, float y){
-    Vector e = mapCoord(x,y);
+    Vector e = mapCoord(x,y,blockSize);
     Block b = blocks.get((int)e.getX()).get((int)e.getY());
     if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
       return;
@@ -194,28 +204,28 @@ public class Grid {
     }
   }
 
-  public static Vector coordMap(int x, int y){
-    x = x*40+20;
-    y = y*40+20;
+  public static Vector coordMap(int x, int y, int blockSize){
+    x = x*blockSize+20;
+    y = y*blockSize+20;
     return new Vector(x,y);
   }
-  public static float coordMapX(int x){
-    return x*40+20;
+  public static float coordMapX(int x, int blockSize){
+    return x*blockSize+blockSize/2;
   }
 
-  public static float coordMapY(int y){
-    return y*40+20;
+  public static float coordMapY(int y, int blockSize){
+    return y*blockSize+blockSize/2;
   }
 
-  public static int mapCoordX(float x){
-   return (int)(x)/40;
+  public static int mapCoordX(float x, int blockSize){
+   return (int)(x)/blockSize;
   }
-  public static int mapCoordY(float y){
-    return (int)(y)/40;
+  public static int mapCoordY(float y, int blockSize){
+    return (int)(y)/blockSize;
   }
-  public static Vector mapCoord(float x, float y){
-    int gx = (int)(x)/40;
-    int gy = (int)(y)/40;
+  public static Vector mapCoord(float x, float y, int blockSize){
+    int gx = (int)(x)/blockSize;
+    int gy = (int)(y)/blockSize;
     return new Vector(gx,gy);
   }
 
@@ -375,7 +385,7 @@ public class Grid {
       if(!(u&&d&&l&&r)){
         System.out.println("Nothing is rooted!!!");
       }
-      blocks.get(x).set(y,new EmptyBlock(coordMap(x,y)));
+      blocks.get(x).set(y,new EmptyBlock(coordMap(x,y,blockSize)));
     }else{
       System.out.println("Block that you wish to destroy is null");
     }

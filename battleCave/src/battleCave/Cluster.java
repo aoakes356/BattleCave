@@ -52,7 +52,7 @@ public class Cluster extends GameObject{
         b.setStatic();
         b.setPosition(b.getPosition().getX()+physics.velocity.x*delta,b.getPosition().getY()+physics.velocity.y*delta);
         //b.setPosition(b.getX()+this.getX(),b.getY()+this.getY());
-        b.setGrid(Grid.mapCoord(getX(),getY()));
+
       }
     }else{
       super.physics.velocity.scale(0);

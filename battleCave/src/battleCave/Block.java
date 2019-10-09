@@ -62,7 +62,7 @@ public class Block extends GameObject {
   }
 
   public Block(int x, int y, float health){
-    this(Grid.coordMapX(x),Grid.coordMapY(y),health,x,y);
+    this(Grid.coordMapX(x,40),Grid.coordMapY(y,40),health,x,y);
 
   }
 
@@ -80,7 +80,7 @@ public class Block extends GameObject {
     if(superOnly){
      super.update(delta);
     }else if(active) {
-      Vector pos = Grid.mapCoord(this.getX(), this.getY());
+      Vector pos = Grid.mapCoord(this.getX(), this.getY(), 40);
       this.gridX = (int) pos.getX();
       this.gridY = (int) pos.getY();
       if (grounded) {
@@ -90,17 +90,18 @@ public class Block extends GameObject {
           addImage(ResourceManager.getImage(BounceGame.STATIC_BLOCK_RSC));
           currentImage = BounceGame.STATIC_BLOCK_RSC;
         }
-        setGrid(Grid.mapCoord(getX(),getY()));
-        setPosition(Grid.coordMap(gridX, gridY));
+        setGrid(Grid.mapCoord(getX(),getY(),40));
+        setPosition(Grid.coordMap(gridX, gridY, 40));
         super.physics.velocity.scale(0);
         super.physics.acceleration.scale(0);
         super.physics.force.scale(0);
       } else if(isStatic){
-        setGrid(Grid.mapCoord(getX(),getY()));
+        setGrid(Grid.mapCoord(getX(),getY(),40));
         staticPath(this, null);
         super.physics.velocity.scale(0);
         super.physics.acceleration.scale(0);
         super.physics.force.scale(0);
+        super.update(delta);
       }else {
         if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
           removeImage(ResourceManager.getImage(currentImage));
@@ -150,7 +151,7 @@ public class Block extends GameObject {
     if(visited == null){
       visited = new ArrayList<>();
     }
-    if(b == null || visited.contains(b)){
+    if(b == null || b.get_id() == GameObject.EMPTY_BLOCK_ID || visited.contains(b)){
       return false;
     }
     visited.add(b);
@@ -189,8 +190,8 @@ public class Block extends GameObject {
             grounded = true;
             rooted = true;
             isStatic = true;
-            Vector pos = Grid.mapCoord(this.getX(), this.getY());
-            Vector gp = Grid.coordMap((int) pos.getX(), (int) pos.getY());
+            Vector pos = Grid.mapCoord(this.getX(), this.getY(), 40);
+            Vector gp = Grid.coordMap((int) pos.getX(), (int) pos.getY(), 40);
             setPosition(gp.getX(), gp.getY());
           }else{
             Block b = (Block)obj;

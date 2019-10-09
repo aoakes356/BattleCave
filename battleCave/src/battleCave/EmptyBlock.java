@@ -11,8 +11,8 @@ public class EmptyBlock extends Block{
   public EmptyBlock(float x, float y) {
     super(x,y);
     superOnly = true;
-    gridX = Grid.mapCoordX(x);
-    gridY = Grid.mapCoordY(y);
+    gridX = Grid.mapCoordX(x,40);
+    gridY = Grid.mapCoordY(y,40);
     removeImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
     addImage(ResourceManager.getImage(BounceGame.EMPTY_BLOCK_RSC));
     currentImage = BounceGame.EMPTY_BLOCK_RSC;
