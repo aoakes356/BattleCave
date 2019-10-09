@@ -22,6 +22,7 @@ public class Block extends GameObject {
   public boolean hasCluster;
   public Block above, below, left, right;
   public String currentImage;
+  public Block(){this(0,0,100.0f);}
   public Block(float x, float y) {
     this(x,y,100.0f);
   }

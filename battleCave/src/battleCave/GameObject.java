@@ -10,6 +10,7 @@ public class GameObject extends Entity {
   public static final int GAMEOBJ_ID = 0;
   public static final int GROUND_ID = 1;
   public static final int BLOCK_ID = 2;
+  public static final int EMPTY_BLOCK_ID = 3;
   public  Physics physics;
 
   public GameObject(final float x, final float y){

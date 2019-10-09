@@ -30,18 +30,22 @@ public class Grid {
     ArrayList<Block> temp;
     chunks = new ArrayList<>();
     pressed = false;
+    int blockcount = 0;
+    int duplicates = 0;
     float x, y;
     for(int i = 0; i < width; i++){
       temp = new ArrayList<>();
       blocks.add(temp);
       for(int j = 0; j < height; j++){
-        temp.add(null);
+        temp.add(new EmptyBlock(coordMap(i,j)));
+        blockcount++;
         /*x = i*40+20;
         y = j*40+20;
         temp.add(new Block(x,y,100,i,j));*/
       }
 
     }
+    System.out.println("TOTAL BLOCK COUNT: "+blockcount);
   }
 
   public void collisionCheck(){  // Check for collisions internally.
@@ -54,7 +58,7 @@ public class Grid {
       for (Iterator<Block> j = column.iterator(); j.hasNext();) {
         temp = j.next();
 
-        if(temp != null ) {
+        if(temp != null && temp.get_id() != GameObject.EMPTY_BLOCK_ID) {
           gridpos = mapCoord(temp.getPosition().getX(),temp.getPosition().getY());
           if((int)gridpos.getX() >= 40 || (int)gridpos.getY() >= 20){
             column.set(column.indexOf(temp),null);
@@ -97,7 +101,7 @@ public class Grid {
         if(j == gridpos.getY()){continue;}
         //System.out.println("Collision check on: ("+temp.gridX+","+temp.gridY+") against ("+temp.gridX+","+j+")");
         temp2 = (this.blocks.get(i)).get(j);
-        if(temp2 != null && temp2.getActive()) {
+        if(temp2 != null && temp2.get_id() != GameObject.EMPTY_BLOCK_ID && temp2.getActive()) {
           temp2.collision(obj);
         }
       }
@@ -106,7 +110,7 @@ public class Grid {
       for (int i = 0; i < this.blocks.size(); i++) {
         for (int j = 0; j < this.blocks.get(i).size(); j++) {
           temp = (this.blocks.get(i)).get(j);
-          if(temp != null) {
+          if(temp != null && temp.get_id() != GameObject.EMPTY_BLOCK_ID) {
             temp.collision(obj);
           }
         }
@@ -117,17 +121,21 @@ public class Grid {
 
   public void update(int delta){
     Block temp;
+    int previous;
     ArrayList<Block> updated = new ArrayList<>();
     for(int i = 0; i < this.blocks.size(); i++){
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
         if(temp != null) {
+          previous = temp.gridY;
           temp.update(delta);
           if (temp.gridX < 40 && temp.gridY < 20) {
-            this.blocks.get(i).remove(j);
-            this.blocks.get(i).add(temp.gridY, temp);
+            if(previous != temp.gridY) {
+              this.blocks.get(i).set(j, new EmptyBlock(coordMap(i, j)));
+              this.blocks.get(i).add(temp.gridY, temp);
+            }
           } else {
-            blocks.get(i).set(j, null);
+            blocks.get(i).set(j, new EmptyBlock(coordMap(i,j)));
           }
         }
       }
@@ -173,6 +181,19 @@ public class Grid {
     }
   }
 
+  public void hover(float x, float y){
+    Vector e = mapCoord(x,y);
+    Block b = blocks.get((int)e.getX()).get((int)e.getY());
+    if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
+      return;
+    }
+    System.out.println("!!Hovering: "+e.getX()+", "+e.getY()+"Block Grid: "+b.gridX+", "+b.gridY);
+    if(b.get_id() == GameObject.EMPTY_BLOCK_ID){
+      EmptyBlock space = (EmptyBlock)b;
+      space.hover();
+    }
+  }
+
   public static Vector coordMap(int x, int y){
     x = x*40+20;
     y = y*40+20;
@@ -201,9 +222,7 @@ public class Grid {
   public void activateBlock(int x, int y){
     Block temp;
     temp = this.blocks.get(x).get(y);
-    if(temp != null){
-
-    }else{
+    if(temp == null || temp.get_id() == GameObject.EMPTY_BLOCK_ID){
       Block nblock = new Block(x,y,100);
       this.blocks.get(x).set(y,nblock);
       this.blocks.get(x).get(y).setActive(true);
@@ -233,7 +252,7 @@ public class Grid {
       down = null;
     }
     nblock.setChanging();
-    if(left != null && left.grounded) {
+    if(left != null  && left.grounded) {
       nblock.setStatic();
       nblock.setGrounded();
     }else if(right != null && right.grounded) {
@@ -246,14 +265,27 @@ public class Grid {
       nblock.setStatic();
       nblock.setGrounded();
     }
+    if(left.get_id() == GameObject.EMPTY_BLOCK_ID) {
+      left = null;
+    }
     nblock.left = left;
+    if(right.get_id() != GameObject.EMPTY_BLOCK_ID ) {
+      right = null;
+    }
     nblock.right = right;
+    if(up.get_id() != GameObject.EMPTY_BLOCK_ID) {
+      up = null;
+    }
     nblock.above = up;
+    if(down.get_id() != GameObject.EMPTY_BLOCK_ID) {
+      down = null;
+    }
     nblock.below = down;
+
   }
 
   public static boolean isRooted(Block b, ArrayList<Block> visited){
-    if(b == null){return false;}
+    if(b == null || b.get_id() == GameObject.EMPTY_BLOCK_ID){return false;}
     boolean u,d,l,r;
     visited.add(b);
     if(b.rooted){
@@ -288,7 +320,7 @@ public class Grid {
   public ArrayList<Cluster> destroyBlock(int x, int y){
     Block start = blocks.get(x).get(y);
     ArrayList<Cluster> clusters = null;
-    if(start != null){
+    if(start != null && start.get_id() != GameObject.EMPTY_BLOCK_ID){
       ArrayList<Block> visitedUp = new ArrayList<>();
       ArrayList<Block> visitedDown = new ArrayList<>();
       ArrayList<Block> visitedLeft = new ArrayList<>();
@@ -355,13 +387,13 @@ public class Grid {
       if(!(u&&d&&l&&r)){
         System.out.println("Nothing is rooted!!!");
       }
+      blocks.get(x).set(y,new EmptyBlock(coordMap(x,y)));
     }else{
       System.out.println("Block that you wish to destroy is null");
     }
     if(clusters != null && clusters.size() == 0){
       clusters = null;
     }
-    blocks.get(x).set(y,null);
     return clusters;
   }
 }
