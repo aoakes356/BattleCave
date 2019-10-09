@@ -16,7 +16,14 @@
 - **[11]**  Create the physics class for use in game objects.
 - **[12]**  Create the game object class. implement collisions?
 - **[13]**  Create the block class. extend game object.
-
-PHASE 1 Grid
 - **[15]**  Implement block gravity logic.
 - **[16]**  Implement mouse interaction with the grid.
+
+PHASE 1 Grid
+- **[17]** Add click and drag functionality.
+- **[18]** Add grid overlay for building mode.
+- **[19]** Add an inventory system - when a block is added subtract from inventory
+           when block is broken, add it to inventory.
+- **[20]** Add a material selection bar.
+PHASE 2 Players and Monsters
+PHASE 3 Menus
