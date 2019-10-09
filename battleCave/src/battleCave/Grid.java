@@ -3,6 +3,7 @@ package battleCave;
 import jig.Vector;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -16,6 +17,9 @@ public class Grid {
   public int mode;
   public int width, height;
   public int widthOffset, heightOffset;
+  public static final int PRESSED = 0;
+  public static final int RELEASED = 1;
+  public boolean pressed;
   private ArrayList<Cluster> chunks;
   public Grid(BounceGame bg){
     blocks = new ArrayList<>();
@@ -25,6 +29,7 @@ public class Grid {
     heightOffset = (bg.ScreenHeight%40)/2;
     ArrayList<Block> temp;
     chunks = new ArrayList<>();
+    pressed = false;
     float x, y;
     for(int i = 0; i < width; i++){
       temp = new ArrayList<>();
@@ -42,10 +47,19 @@ public class Grid {
   public void collisionCheck(){  // Check for collisions internally.
     Block temp;
     boolean save;
-    for (int i = 0; i < this.blocks.size(); i++) {
-      for (int j = 0; j < this.blocks.get(i).size(); j++) {
-        temp = (this.blocks.get(i)).get(j);
+    ArrayList<Block> column;
+    Vector gridpos;
+    for (Iterator<ArrayList<Block>> i = blocks.iterator(); i.hasNext();) {
+      column = i.next();
+      for (Iterator<Block> j = column.iterator(); j.hasNext();) {
+        temp = j.next();
+
         if(temp != null ) {
+          gridpos = mapCoord(temp.getPosition().getX(),temp.getPosition().getY());
+          if((int)gridpos.getX() >= 40 || (int)gridpos.getY() >= 20){
+            column.set(column.indexOf(temp),null);
+            return;
+          }
           save = temp.grounded;
           collision(temp);
           if(temp.grounded && !save){
@@ -109,8 +123,12 @@ public class Grid {
         temp = (this.blocks.get(i)).get(j);
         if(temp != null) {
           temp.update(delta);
-          this.blocks.get(i).remove(j);
-          this.blocks.get(i).add(temp.gridY,temp);
+          if (temp.gridX < 40 && temp.gridY < 20) {
+            this.blocks.get(i).remove(j);
+            this.blocks.get(i).add(temp.gridY, temp);
+          } else {
+            blocks.get(i).set(j, null);
+          }
         }
       }
     }
@@ -141,16 +159,18 @@ public class Grid {
   public void clickHandler(Vector e, int button){
     System.out.println("Activating block! "+button);
     e = mapCoord(e.getX(),e.getY());
+    if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
+      return;
+    }
     ArrayList<Cluster> clusters;
-    if(button == 1) {
+    if (button == 1) {
       activateBlock((int) e.getX(), (int) e.getY());
-    }else if(button == 0){
+    } else if (button == 0) {
       clusters = destroyBlock((int) e.getX(), (int) e.getY());
-      if(clusters != null){
+      if (clusters != null) {
         chunks.addAll(clusters);
       }
     }
-
   }
 
   public static Vector coordMap(int x, int y){

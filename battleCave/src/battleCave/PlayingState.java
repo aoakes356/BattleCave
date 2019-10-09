@@ -22,6 +22,8 @@ import org.newdawn.slick.state.StateBasedGame;
 class PlayingState extends BasicGameState {
 	int bounces;
 	public Grid g;
+	private boolean pressed;
+	private int button;
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
@@ -40,18 +42,28 @@ class PlayingState extends BasicGameState {
 		//bg.block.render(g);
     bg.grid.render(g);
 		bg.ground.render(g);
+		if(pressed){
+		  bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button);
+    }
 		g.drawString("Bounces: " + bounces, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
 	}
 
+
   @Override
-  public void mouseClicked(int button, int x, int y, int clickCount) {
-    super.mouseClicked(button, x, y, clickCount);
-    if(g != null){
-      g.clickHandler(new Vector(x,y), button);
-    }
+  public void mousePressed(int button, int x, int y){
+	  super.mousePressed(button,x,y);
+	  pressed = true;
+	  this.button = button;
+
   }
+  @Override
+  public void mouseReleased(int button, int x, int y){
+    super.mousePressed(button,x,y);
+    pressed = false;
+  }
+
 
   @Override
 	public void update(GameContainer container, StateBasedGame game,
