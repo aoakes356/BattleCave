@@ -11,6 +11,7 @@ import java.util.ArrayList;
 //Block size is 40x40
 public class Block extends GameObject {
   public float health;
+  public boolean superOnly;
   public float currentHealth;
   public int gridX;
   public int gridY;
@@ -40,6 +41,7 @@ public class Block extends GameObject {
     grounded = false;
     rooted = false;
     hasCluster = false;
+    superOnly = false;
   }
   public Block(float x, float y, float health, int gx, int gy){
     super(x,y);
@@ -56,6 +58,7 @@ public class Block extends GameObject {
     grounded =false;
     rooted = false;
     hasCluster = false;
+    superOnly = false;
   }
 
   public Block(int x, int y, float health){
@@ -74,7 +77,9 @@ public class Block extends GameObject {
 
   @Override
   public void update(int delta){
-    if(active) {
+    if(superOnly){
+     super.update(delta);
+    }else if(active) {
       Vector pos = Grid.mapCoord(this.getX(), this.getY());
       this.gridX = (int) pos.getX();
       this.gridY = (int) pos.getY();

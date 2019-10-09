@@ -10,6 +10,7 @@ public class EmptyBlock extends Block{
   }
   public EmptyBlock(float x, float y) {
     super(x,y);
+    superOnly = true;
     gridX = Grid.mapCoordX(x);
     gridY = Grid.mapCoordY(y);
     removeImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
@@ -30,6 +31,7 @@ public class EmptyBlock extends Block{
     addImage(ResourceManager.getImage(currentImage));
   }
   public void update(int delta){
+    super.update(delta);
     if(hovered){
       hovered = false;
     }else {

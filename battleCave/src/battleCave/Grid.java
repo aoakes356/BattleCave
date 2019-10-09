@@ -131,8 +131,8 @@ public class Grid {
           temp.update(delta);
           if (temp.gridX < 40 && temp.gridY < 20) {
             if(previous != temp.gridY) {
-              this.blocks.get(i).set(j, new EmptyBlock(coordMap(i, j)));
-              this.blocks.get(i).add(temp.gridY, temp);
+              this.blocks.get(i).set(previous, new EmptyBlock(coordMap(i, j)));
+              this.blocks.get(i).set(temp.gridY, temp);
             }
           } else {
             blocks.get(i).set(j, new EmptyBlock(coordMap(i,j)));
@@ -265,21 +265,9 @@ public class Grid {
       nblock.setStatic();
       nblock.setGrounded();
     }
-    if(left.get_id() == GameObject.EMPTY_BLOCK_ID) {
-      left = null;
-    }
     nblock.left = left;
-    if(right.get_id() != GameObject.EMPTY_BLOCK_ID ) {
-      right = null;
-    }
     nblock.right = right;
-    if(up.get_id() != GameObject.EMPTY_BLOCK_ID) {
-      up = null;
-    }
     nblock.above = up;
-    if(down.get_id() != GameObject.EMPTY_BLOCK_ID) {
-      down = null;
-    }
     nblock.below = down;
 
   }
