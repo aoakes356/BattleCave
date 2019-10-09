@@ -19,9 +19,9 @@
 - **[15]**  Implement block gravity logic.
 - **[16]**  Implement mouse interaction with the grid.
 - **[17]** Add click and drag functionality.
+- **[18]** Add grid overlay for building mode.
 
 PHASE 1 Grid
-- **[18]** Add grid overlay for building mode.
 - **[19]** Add an inventory system - when a block is added subtract from inventory
            when block is broken, add it to inventory.
 - **[20]** Add a material selection bar.
