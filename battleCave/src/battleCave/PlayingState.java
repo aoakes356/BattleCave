@@ -42,7 +42,7 @@ class PlayingState extends BasicGameState {
 		//bg.block.render(g);
     bg.grid.render(g);
 		bg.ground.render(g);
-		g.drawString("Bounces: " + bounces, 10, 30);
+		g.drawString("Money: " + bg.grid.money, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
 	}
@@ -69,7 +69,7 @@ class PlayingState extends BasicGameState {
 		BounceGame bg = (BounceGame)game;
 		//bg.block.collision(bg.ground);
     if(pressed){
-      bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button);
+      bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button, 1);
     }else{
       bg.grid.hover(container.getInput().getMouseX(),container.getInput().getMouseY());
     }

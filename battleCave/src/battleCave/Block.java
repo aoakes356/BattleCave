@@ -23,6 +23,7 @@ public class Block extends GameObject {
   public boolean hasCluster;
   public Block above, below, left, right;
   public String currentImage;
+  public int cost;
   public Block(){this(0,0,100.0f);}
   public Block(float x, float y) {
     this(x,y,100.0f);
@@ -35,6 +36,7 @@ public class Block extends GameObject {
     currentImage = BounceGame.BASIC_BLOCK_RSC;
     this.health = health;
     this.currentHealth = health;
+    cost = 10;
     drag = true;
     isStatic = false;
     active = false;
@@ -59,6 +61,7 @@ public class Block extends GameObject {
     rooted = false;
     hasCluster = false;
     superOnly = false;
+    cost = 10;
   }
 
   public Block(int x, int y, float health){

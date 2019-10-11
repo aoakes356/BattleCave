@@ -21,11 +21,13 @@ public class Grid {
   public static final int RELEASED = 1;
   public boolean pressed;
   public int blockSize;
+  public int money;
   private ArrayList<Cluster> chunks;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
+    money = 100;
     blocks = new ArrayList<>();
-    mode = BATTLE_MODE;
+    mode = BUILD_MODE;
     width = bg.ScreenWidth/blockSize;
     height = bg.ScreenHeight/blockSize;
     widthOffset = (bg.ScreenWidth%blockSize)/2;  // Use these values to center the grid on the screen.
@@ -174,19 +176,21 @@ public class Grid {
     }
   }
 
-  public void clickHandler(Vector e, int button){
-    System.out.println("Activating block! "+button);
-    e = mapCoord(e.getX(),e.getY(),blockSize);
-    if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
-      return;
-    }
-    ArrayList<Cluster> clusters;
-    if (button == 1) {
-      activateBlock((int) e.getX(), (int) e.getY());
-    } else if (button == 0) {
-      clusters = destroyBlock((int) e.getX(), (int) e.getY());
-      if (clusters != null) {
-        chunks.addAll(clusters);
+  public void clickHandler(Vector e, int button, int id){
+    if(mode == BUILD_MODE) {
+      System.out.println("Activating block! " + button);
+      e = mapCoord(e.getX(), e.getY(), blockSize);
+      if ((int) e.getX() >= blocks.size() || (int) e.getY() >= blocks.get((int) e.getX()).size()) {
+        return;
+      }
+      ArrayList<Cluster> clusters;
+      if (button == 1) {
+        activateBlock((int) e.getX(), (int) e.getY(), id);
+      } else if (button == 0) {
+        clusters = destroyBlock((int) e.getX(), (int) e.getY());
+        if (clusters != null) {
+          chunks.addAll(clusters);
+        }
       }
     }
   }
@@ -229,14 +233,23 @@ public class Grid {
     return new Vector(gx,gy);
   }
 
-  public void activateBlock(int x, int y){
+  public void activateBlock(int x, int y, int id){
     Block temp;
     temp = this.blocks.get(x).get(y);
     if(temp == null || temp.get_id() == GameObject.EMPTY_BLOCK_ID){
-      Block nblock = new Block(x,y,100);
-      this.blocks.get(x).set(y,nblock);
-      this.blocks.get(x).get(y).setActive(true);
-      findNeighbors(nblock);
+      Block nblock;
+      if(id == GameObject.BLOCK_ID) {
+        nblock = new Block(x, y, 100);
+      }else{
+        nblock = new Block(x, y, 100);
+      }
+      if(money - nblock.cost >= 0) {
+        this.blocks.get(x).set(y, nblock);
+        this.blocks.get(x).get(y).setActive(true);
+        findNeighbors(nblock);
+        money -= nblock.cost;
+      }
+
     }
   }
 
@@ -319,6 +332,7 @@ public class Grid {
     Block start = blocks.get(x).get(y);
     ArrayList<Cluster> clusters = null;
     if(start != null && start.get_id() != GameObject.EMPTY_BLOCK_ID){
+      money += start.cost;
       ArrayList<Block> visitedUp = new ArrayList<>();
       ArrayList<Block> visitedDown = new ArrayList<>();
       ArrayList<Block> visitedLeft = new ArrayList<>();
@@ -394,4 +408,21 @@ public class Grid {
     }
     return clusters;
   }
+
+  public void setMoney(int money){
+    this.money = money;
+  }
+
+  public void addMoney(int money){
+    this.money += money;
+  }
+
+  public void removeMoney(int money){
+    this.money -= money;
+  }
+
+  public void setMode(int m){
+    mode = m;
+  }
+
 }
