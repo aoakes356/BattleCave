@@ -22,10 +22,11 @@ public class Grid {
   public boolean pressed;
   public int blockSize;
   public int money;
+  private int selected;
   private ArrayList<Cluster> chunks;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
-    money = 100;
+    money = 10000;
     blocks = new ArrayList<>();
     mode = BUILD_MODE;
     width = bg.ScreenWidth/blockSize;
@@ -50,7 +51,6 @@ public class Grid {
       }
 
     }
-    System.out.println("TOTAL BLOCK COUNT: "+blockcount);
   }
 
   public void collisionCheck(){  // Check for collisions internally.
@@ -178,7 +178,6 @@ public class Grid {
 
   public void clickHandler(Vector e, int button, int id){
     if(mode == BUILD_MODE) {
-      System.out.println("Activating block! " + button);
       e = mapCoord(e.getX(), e.getY(), blockSize);
       if ((int) e.getX() >= blocks.size() || (int) e.getY() >= blocks.get((int) e.getX()).size()) {
         return;
@@ -201,7 +200,6 @@ public class Grid {
     if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
       return;
     }
-    System.out.println("!!Hovering: "+e.getX()+", "+e.getY()+"Block Grid: "+b.gridX+", "+b.gridY);
     if(b.get_id() == GameObject.EMPTY_BLOCK_ID){
       EmptyBlock space = (EmptyBlock)b;
       space.hover();
@@ -236,10 +234,12 @@ public class Grid {
   public void activateBlock(int x, int y, int id){
     Block temp;
     temp = this.blocks.get(x).get(y);
-    if(temp == null || temp.get_id() == GameObject.EMPTY_BLOCK_ID){
+    if(temp == null || temp.get_id() != id){
       Block nblock;
       if(id == GameObject.BLOCK_ID) {
         nblock = new Block(x, y, 100);
+      }else if(id == GameObject.EMPTY_BLOCK_ID){
+        nblock = new EmptyBlock(coordMap(x,y,40));
       }else{
         nblock = new Block(x, y, 100);
       }
@@ -301,7 +301,6 @@ public class Grid {
     visited.add(b);
     if(b.rooted){
       b.grounded = true;
-      System.out.println("The Root has been found!");
       return true;
     }else{
       if(b.below != null && !visited.contains(b.below)){
@@ -397,11 +396,9 @@ public class Grid {
         }
       }
       if(!(u&&d&&l&&r)){
-        System.out.println("Nothing is rooted!!!");
       }
       blocks.get(x).set(y,new EmptyBlock(coordMap(x,y,blockSize)));
     }else{
-      System.out.println("Block that you wish to destroy is null");
     }
     if(clusters != null && clusters.size() == 0){
       clusters = null;
@@ -425,4 +422,11 @@ public class Grid {
     mode = m;
   }
 
+  public int getSelected() {
+    return selected;
+  }
+
+  public void setSelected(int selected) {
+    this.selected = selected;
+  }
 }
