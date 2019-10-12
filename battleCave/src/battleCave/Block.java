@@ -16,7 +16,7 @@ public class Block extends GameObject {
   public int gridX;
   public int gridY;
   public boolean drag;
-  public boolean isStatic;
+  private boolean isStatic;
   private boolean active;
   public boolean grounded;
   public boolean rooted;
@@ -111,7 +111,7 @@ public class Block extends GameObject {
           addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
           currentImage = BounceGame.BASIC_BLOCK_RSC;
         }
-        staticPath(this,null);
+        //staticPath(this,null);
         if (health <= 0) {
           active = false;
           return;
@@ -160,12 +160,12 @@ public class Block extends GameObject {
     visited.add(b);
     boolean res = staticPath(b.left,visited)||staticPath(b.right,visited)||staticPath(b.below,visited)||staticPath(b.above,visited);
     if(staticNeighbors(b)){
-      b.setStatic();
+      //b.setStatic();
       b.setGrounded();
       return true;
     }else{
       if(res){
-        b.setStatic();
+        //b.setStatic();
         b.setGrounded();
       }
       return res;
@@ -192,14 +192,12 @@ public class Block extends GameObject {
           if(obj.get_id() == GameObject.GROUND_ID){
             grounded = true;
             rooted = true;
-            isStatic = true;
             Vector pos = Grid.mapCoord(this.getX(), this.getY(), 40);
             Vector gp = Grid.coordMap((int) pos.getX(), (int) pos.getY(), 40);
             setPosition(gp.getX(), gp.getY());
           }else{
             Block b = (Block)obj;
             grounded = b.grounded;
-            isStatic = b.isStatic;
           }
         }
         Block temp3;
@@ -210,10 +208,16 @@ public class Block extends GameObject {
               translate(c.getMinPenetration().scale(.5f));
               c = collides(obj);
             }else if(grounded && !temp3.grounded){
-              temp3.translate(c.getMinPenetration().scale(.5f));
+              temp3.translate(c.getMinPenetration().scale(-.5f));
               c = collides(obj);
             }else{
-              c = null;
+              if(!isStatic && temp3.isStatic){
+                temp3.translate(c.getMinPenetration().scale(-.5f));
+                c = collides(obj);
+              }else{
+                translate(c.getMinPenetration().scale(.5f));
+                c = collides(obj);
+              }
             }
           }else if(grounded) {
             translate(c.getMinPenetration().scale(.5f));

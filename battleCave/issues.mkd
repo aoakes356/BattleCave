@@ -22,9 +22,9 @@
 - **[18]** Add grid overlay for building mode.
 - **[19]** Add an inventory system - when a block is added subtract from inventory
            when block is broken, add it to inventory(decided to go with cost based rather than item based).
+- **[20]** Add a material selection bar.
 
 PHASE 1 Grid
-- **[20]** Add a material selection bar.
 - **[21]** Fix bug that causes blocks to overlap after collisions sometimes.
 PHASE 2 Players and Monsters
 PHASE 3 Menus

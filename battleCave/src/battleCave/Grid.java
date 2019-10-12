@@ -53,6 +53,20 @@ public class Grid {
     }
   }
 
+  public boolean isAvailable(int x, int y){ // Check if a grid space contains part or all of a block.
+    Vector gpos;
+    for(ArrayList<Block> column: blocks){
+      for(Block b: column){
+        if(b.get_id() == GameObject.EMPTY_BLOCK_ID || b.grounded){continue;}
+        gpos = mapCoord(b.getX(),b.getY(),blockSize);
+        if(gpos.getX() == x && (gpos.getY() == y || gpos.getY()+1 == y || gpos.getY()-1 == y)){
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   public void collisionCheck(){  // Check for collisions internally.
     Block temp;
     boolean save;
@@ -69,11 +83,8 @@ public class Grid {
             column.set(column.indexOf(temp),null);
             return;
           }
-          save = temp.grounded;
           collision(temp);
-          if(temp.grounded && !save){
-            isRooted(temp,new ArrayList<>());
-          }else if(temp.grounded){
+          if(temp.grounded){
             findNeighbors(temp);
           }
         }
@@ -127,6 +138,7 @@ public class Grid {
   public void update(int delta){
     Block temp;
     int previous;
+    ArrayList<Block> visited = new ArrayList<>();
     for(int i = 0; i < this.blocks.size(); i++){
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
@@ -145,6 +157,7 @@ public class Grid {
           } else {
             blocks.get(i).set(j, new EmptyBlock(coordMap(i,j,blockSize)));
           }
+
         }
       }
     }
@@ -157,6 +170,26 @@ public class Grid {
     }
     if(chunks.size() > 0){
       System.out.println("falling chunks.");
+    }
+  }
+
+  public static void drawLine(Graphics g, Block a, Block b, ArrayList<Block> visited){
+    // Draw a line between block a and block b
+    if(a != null && b != null && a.get_id() != GameObject.EMPTY_BLOCK_ID && b.get_id() != GameObject.EMPTY_BLOCK_ID) {
+      g.drawLine(a.getX(), a.getY(), b.getX(), b.getY());
+      visited.add(a);
+      visited.add(b);
+    }
+  }
+  public void drawLines(Graphics g){
+    ArrayList<Block> visited = new ArrayList<>();
+    for(ArrayList<Block> column: blocks) {
+      for(Block b:column) {
+          drawLine(g, b, b.left, visited);
+          drawLine(g, b, b.right, visited);
+          drawLine(g, b, b.above, visited);
+          drawLine(g, b, b.below, visited);
+      }
     }
   }
 
@@ -174,6 +207,7 @@ public class Grid {
         }
       }
     }
+    drawLines(g);
   }
 
   public void clickHandler(Vector e, int button, int id){
@@ -196,10 +230,10 @@ public class Grid {
 
   public void hover(float x, float y){
     Vector e = mapCoord(x,y,blockSize);
-    Block b = blocks.get((int)e.getX()).get((int)e.getY());
     if((int)e.getX() >= blocks.size() || (int)e.getY() >= blocks.get((int)e.getX()).size()){
       return;
     }
+    Block b = blocks.get((int)e.getX()).get((int)e.getY());
     if(b.get_id() == GameObject.EMPTY_BLOCK_ID){
       EmptyBlock space = (EmptyBlock)b;
       space.hover();
@@ -211,6 +245,11 @@ public class Grid {
     y = y*blockSize+20;
     return new Vector(x,y);
   }
+
+  public static void settle(Block b, int blockSize){
+    b.setPosition(coordMap(b.gridX,b.gridY,blockSize));
+  }
+
   public static float coordMapX(int x, int blockSize){
     return x*blockSize+blockSize/2;
   }
@@ -234,7 +273,7 @@ public class Grid {
   public void activateBlock(int x, int y, int id){
     Block temp;
     temp = this.blocks.get(x).get(y);
-    if(temp == null || temp.get_id() != id){
+    if((temp == null || temp.get_id() != id)&&isAvailable(x,y)){
       Block nblock;
       if(id == GameObject.BLOCK_ID) {
         nblock = new Block(x, y, 100);
@@ -256,6 +295,7 @@ public class Grid {
   public void findNeighbors(Block nblock){
     int x = nblock.gridX;
     int y = nblock.gridY;
+
     Block up, down, left, right;
     if(x > 0) {
       left = blocks.get(x - 1).get(y);
@@ -276,16 +316,14 @@ public class Grid {
     }
     nblock.setChanging();
     if(left != null  && left.grounded) {
-      nblock.setStatic();
       nblock.setGrounded();
     }else if(right != null && right.grounded) {
-      nblock.setStatic();
       nblock.setGrounded();
     }else if(up != null && up.grounded) {
-      nblock.setStatic();
       nblock.setGrounded();
     }else if(down != null && down.grounded) {
-      nblock.setStatic();
+      nblock.setGrounded();
+    }else if(nblock.rooted){
       nblock.setGrounded();
     }
     nblock.left = left;
@@ -299,31 +337,35 @@ public class Grid {
     if(b == null || b.get_id() == GameObject.EMPTY_BLOCK_ID){return false;}
     boolean u,d,l,r;
     visited.add(b);
-    if(b.rooted){
-      b.grounded = true;
-      return true;
+
+    if(b.below != null && !visited.contains(b.below)){
+      d = isRooted(b.below,visited);
     }else{
-      if(b.below != null && !visited.contains(b.below)){
-        d = isRooted(b.below,visited);
-      }else{
-        d = false;
-      }if(b.above != null && !visited.contains(b.above)){
-        u = isRooted(b.above, visited);
-      }else{
-        u = false;
-      }if(b.left != null && !visited.contains(b.left)){
-        l = isRooted(b.left, visited);
-      }else{
-        l = false;
-      }if(b.right != null && !visited.contains(b.right)){
-        r = isRooted(b.right, visited);
-      }else{
-        r = false;
-      }
-      b.grounded = d||u||l||r;
-      b.isStatic = b.grounded;
-      return b.grounded;
+      d = false;
+    }if(b.above != null && !visited.contains(b.above)){
+      u = isRooted(b.above, visited);
+    }else{
+      u = false;
+    }if(b.left != null && !visited.contains(b.left)){
+      l = isRooted(b.left, visited);
+    }else{
+      l = false;
+    }if(b.right != null && !visited.contains(b.right)){
+      r = isRooted(b.right, visited);
+    }else{
+      r = false;
     }
+    if(b.rooted){
+      b.setGrounded();
+      return true;
+    }
+    if(d||u||l||r){
+      b.setGrounded();
+    }else{
+      b.setChanging();
+    }
+    return b.grounded;
+
   }
 
 
@@ -352,22 +394,28 @@ public class Grid {
       Block first;
       clusters = new ArrayList<>();
       if(u){
+        for(Block b: visitedUp){
+          b.setGrounded();
+        }
         u = false;
       }else{
-       u = true;
-       if(visitedUp.size() > 0){
-         first = visitedUp.get(0);
-         if(!(visitedDown.contains(first) || visitedLeft.contains(first) ||visitedRight.contains(first))){
-           clusters.add(new Cluster(visitedUp));
-         }
-       }
+        u = true;
+        if(visitedUp.size() > 0){
+          first = visitedUp.get(0);
+          if(!(visitedDown.contains(first) || visitedLeft.contains(first) ||visitedRight.contains(first))){
+            clusters.add(new Cluster(visitedUp));
+          }
+        }
       }
       if(d){
+        for(Block b: visitedDown){
+          b.setGrounded();
+        }
         d = false;
       }else{
         d = true;
         if(visitedDown.size() >0 ){
-         first = visitedDown.get(0);
+          first = visitedDown.get(0);
           if(!(visitedLeft.contains(first) || visitedRight.contains(first) || visitedUp.contains(first))){
             clusters.add(new Cluster(visitedDown));
           }
@@ -375,6 +423,9 @@ public class Grid {
       }
       if(l){
         l = false;
+        for(Block b:visitedLeft){
+          b.setGrounded();
+        }
       }else{
         l = true;
         if(visitedLeft.size() > 0){
@@ -386,6 +437,9 @@ public class Grid {
       }
       if(r){
         r = false;
+        for(Block b: visitedRight){
+          b.setGrounded();
+        }
       }else{
         r = true;
         if(visitedRight.size() > 0){
