@@ -22,6 +22,7 @@ import org.newdawn.slick.state.StateBasedGame;
 class PlayingState extends BasicGameState {
 	int bounces;
 	public Grid g;
+	public BounceGame bounceGame;
 	private boolean pressed;
 	private int button;
 	private boolean itemPressed;
@@ -39,6 +40,7 @@ class PlayingState extends BasicGameState {
 		g = ((BounceGame)game).grid;
 		itemPressed = false;
 		clicked = false;
+		bounceGame = (BounceGame)game;
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
@@ -48,6 +50,7 @@ class PlayingState extends BasicGameState {
     bg.grid.render(g);
 		bg.ground.render(g);
 		bg.items.render(g);
+		bg.creature.render(g);
 		g.drawString("Money: " + bg.grid.money, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
@@ -79,6 +82,11 @@ class PlayingState extends BasicGameState {
 	  if(key == Input.KEY_I){
 	    itemPressed = !itemPressed;
     }
+    bounceGame.creature.keyHandler(key,true);
+  }
+
+  public void keyReleased(int key, char c){
+    bounceGame.creature.keyHandler(key,false);
   }
 
 
@@ -104,7 +112,10 @@ class PlayingState extends BasicGameState {
     }
     bg.grid.setSelected(bg.items.selected);
 		bg.grid.collision(bg.ground);
+		bg.grid.collision(bg.creature);
 		bg.grid.update(delta);
+		bg.creature.update(delta);
+		bg.creature.collision(bg.ground);
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
 
