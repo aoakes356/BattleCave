@@ -23,8 +23,13 @@
 - **[19]** Add an inventory system - when a block is added subtract from inventory
            when block is broken, add it to inventory(decided to go with cost based rather than item based).
 - **[20]** Add a material selection bar.
-
-PHASE 1 Grid
 - **[21]** Fix bug that causes blocks to overlap after collisions sometimes.
+
+PHASE 1 Grid - (Low bar Complete)
 PHASE 2 Players and Monsters
+- **[22]** Implement a super class that will be extended by player and monster classes.
+- **[23]** Implement player class, make basic art.
+- **[24]** Implement a Monster class, make basic art.
+- **[25]** Add a battle state.
+- **[26]** Add a way to transition between battle and building state.
 PHASE 3 Menus

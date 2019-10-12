@@ -24,9 +24,11 @@ public class Grid {
   public int money;
   private int selected;
   private ArrayList<Cluster> chunks;
+  private int blockCount;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
     money = 10000;
+    blockCount = 0;
     blocks = new ArrayList<>();
     mode = BUILD_MODE;
     width = bg.ScreenWidth/blockSize;
@@ -36,15 +38,11 @@ public class Grid {
     ArrayList<Block> temp;
     chunks = new ArrayList<>();
     pressed = false;
-    int blockcount = 0;
-    int duplicates = 0;
-    float x, y;
     for(int i = 0; i < width; i++){
       temp = new ArrayList<>();
       blocks.add(temp);
       for(int j = 0; j < height; j++){
         temp.add(new EmptyBlock(coordMap(i,j,blockSize)));
-        blockcount++;
         /*x = i*40+20;
         y = j*40+20;
         temp.add(new Block(x,y,100,i,j));*/
@@ -282,11 +280,12 @@ public class Grid {
       }else{
         nblock = new Block(x, y, 100);
       }
-      if(money - nblock.cost >= 0) {
+      if(money - nblock.cost >= 0 && blockCount <= 500) {
         this.blocks.get(x).set(y, nblock);
         this.blocks.get(x).get(y).setActive(true);
         findNeighbors(nblock);
         money -= nblock.cost;
+        blockCount++;
       }
 
     }
@@ -374,6 +373,7 @@ public class Grid {
     ArrayList<Cluster> clusters = null;
     if(start != null && start.get_id() != GameObject.EMPTY_BLOCK_ID){
       money += start.cost;
+      blockCount--;
       ArrayList<Block> visitedUp = new ArrayList<>();
       ArrayList<Block> visitedDown = new ArrayList<>();
       ArrayList<Block> visitedLeft = new ArrayList<>();
