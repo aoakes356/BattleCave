@@ -4,10 +4,7 @@ import java.util.Iterator;
 
 import jig.Vector;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -24,7 +21,12 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 class PlayingState extends BasicGameState {
 	int bounces;
-	
+	public Grid g;
+	private boolean pressed;
+	private int button;
+	private boolean itemPressed;
+	private boolean clicked;
+	private int clickedX, clickedY, clickedButton;
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
@@ -34,25 +36,80 @@ class PlayingState extends BasicGameState {
 	public void enter(GameContainer container, StateBasedGame game) {
 		bounces = 0;
 		container.setSoundOn(true);
+		g = ((BounceGame)game).grid;
+		itemPressed = false;
+		clicked = false;
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
 			Graphics g) throws SlickException {
 		BounceGame bg = (BounceGame)game;
-		
-		bg.ball.render(g);
-		g.drawString("Bounces: " + bounces, 10, 30);
+		//bg.block.render(g);
+    bg.grid.render(g);
+		bg.ground.render(g);
+		bg.items.render(g);
+		g.drawString("Money: " + bg.grid.money, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
 	}
 
+
 	@Override
+  public void mouseClicked(int button, int x, int y, int count){
+	  clicked = true;
+	  clickedX = x;
+	  clickedY = y;
+	  clickedButton = button;
+  }
+
+  @Override
+  public void mousePressed(int button, int x, int y){
+	  super.mousePressed(button,x,y);
+	  pressed = true;
+	  this.button = button;
+
+  }
+  @Override
+  public void mouseReleased(int button, int x, int y){
+    super.mousePressed(button,x,y);
+    pressed = false;
+  }
+  @Override
+  public void keyPressed(int key, char c){
+	  if(key == Input.KEY_I){
+	    itemPressed = !itemPressed;
+    }
+  }
+
+
+  @Override
 	public void update(GameContainer container, StateBasedGame game,
 			int delta) throws SlickException {
-
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
-		
+		//bg.block.collision(bg.ground);
+    if(pressed && !bg.items.isActive()){
+      bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button, bg.grid.getSelected());
+    }else{
+      bg.grid.hover(container.getInput().getMouseX(),container.getInput().getMouseY());
+    }
+    if(itemPressed){
+      bg.items.setActive(true);
+    }else{
+      bg.items.setActive(false);
+    }
+    if(bg.items.isActive() && clicked){
+      bg.items.clickHandler(clickedButton,clickedX,clickedY);
+      clicked = false;
+    }
+    bg.grid.setSelected(bg.items.selected);
+		bg.grid.collision(bg.ground);
+		bg.grid.update(delta);
+		bg.grid.collisionCheck();
+		bg.items.update(delta);
+
+		//bg.block.update(delta);
+
 
 	}
 
