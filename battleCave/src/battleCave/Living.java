@@ -27,6 +27,7 @@ public class Living extends GameObject{
     maxSpeed = 1.0f;
     health = 100;
     gridPosition = Grid.mapCoord(x,y,40);
+    physics.setMaxAcceleration(1.0f);
     addImageWithBoundingBox(ResourceManager.getImage(BounceGame.LIVING_THING_RSC));
 
   }
