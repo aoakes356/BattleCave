@@ -244,9 +244,6 @@ public class Grid {
     return new Vector(x,y);
   }
 
-  public static void settle(Block b, int blockSize){
-    b.setPosition(coordMap(b.gridX,b.gridY,blockSize));
-  }
 
   public static float coordMapX(int x, int blockSize){
     return x*blockSize+blockSize/2;

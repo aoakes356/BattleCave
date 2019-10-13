@@ -112,10 +112,9 @@ class PlayingState extends BasicGameState {
     }
     bg.grid.setSelected(bg.items.selected);
 		bg.grid.collision(bg.ground);
-		bg.grid.collision(bg.creature);
 		bg.grid.update(delta);
 		bg.creature.update(delta);
-		bg.creature.collision(bg.ground);
+    bg.creature.gridCollision(bg.grid,bg.ground);
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
 

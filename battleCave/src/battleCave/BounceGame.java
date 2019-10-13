@@ -61,7 +61,7 @@ public class BounceGame extends StateBasedGame {
 	public static final String EMPTYHOVER_BLOCK_RSC = "battleCave/resource/Empty.png";
   public static final String EMPTY_BLOCK_RSC = "battleCave/resource/EmptyHover.png";
   public static final String EMPTY_MENU_RSC = "battleCave/resource/ItemMenu.png";
-  public static final String LIVING_THING_RSC = "battleCave/resource/livingThing.png";
+  public static final String LIVING_THING_RSC = "battleCave/resource/survive.png";
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 

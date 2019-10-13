@@ -104,6 +104,11 @@ public class Block extends GameObject {
         super.physics.velocity.scale(0);
         super.physics.acceleration.scale(0);
         super.physics.force.scale(0);
+        if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
+          removeImage(ResourceManager.getImage(currentImage));
+          addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
+          currentImage = BounceGame.BASIC_BLOCK_RSC;
+        }
         super.update(delta);
       }else {
         if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
