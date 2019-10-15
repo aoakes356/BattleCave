@@ -7,16 +7,16 @@ import java.util.ArrayList;
 
 public class Player extends Living {
 
-  ArrayList<Projectile> projeciles;
+  ArrayList<Projectile> projectiles;
 
   public Player(float x, float y) {
     super(x, y);
-    projeciles = new ArrayList<>();
+    projectiles = new ArrayList<>();
   }
 
   public void attack(Vector dir){
     Projectile p = new Projectile(getX(),getY(),dir,1);
-    projeciles.add(p);
+    projectiles.add(p);
   }
 
   public void keyHandler(int key, boolean pressed){
@@ -25,20 +25,20 @@ public class Player extends Living {
 
   public void clickHandler(int button, int x, int y){
     if(button == 0){
-      attack(new Vector(x,y));
+      attack(new Vector(x,y).subtract(getPosition()));
     }
   }
 
   public void update(int delta){
     super.update(delta);
-    for(Projectile p: projeciles){
+    for(Projectile p: projectiles){
       p.update(delta);
     }
   }
 
   public void render(Graphics g){
     super.render(g);
-    for(Projectile p : projeciles){
+    for(Projectile p : projectiles){
       p.render(g);
     }
   }

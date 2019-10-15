@@ -89,7 +89,8 @@ public class BounceGame extends StateBasedGame {
 		ScreenHeight = height;
 		ScreenWidth = width;
 
-		Entity.setCoarseGrainedCollisionBoundary(Entity.AABB);
+		Entity.setCoarseGrainedCollisionBoundary(Entity.CIRCLE);
+		//Entity.setDebug(true);
 		explosions = new ArrayList<Bang>(10);
 				
 	}

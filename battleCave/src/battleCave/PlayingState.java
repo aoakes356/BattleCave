@@ -63,11 +63,13 @@ class PlayingState extends BasicGameState {
 	  clickedX = x;
 	  clickedY = y;
 	  clickedButton = button;
+	  System.out.println("Mouse clicked: "+button);
   }
 
   @Override
   public void mousePressed(int button, int x, int y){
 	  super.mousePressed(button,x,y);
+	  System.out.println("Mouse pressed: "+button);
 	  pressed = true;
 	  this.button = button;
 
@@ -106,8 +108,14 @@ class PlayingState extends BasicGameState {
     }else{
       bg.items.setActive(false);
     }
+    if(clicked){
+     //bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
+    }
     if(bg.items.isActive() && clicked){
       bg.items.clickHandler(clickedButton,clickedX,clickedY);
+      clicked = false;
+    }else if(clicked){
+      bg.grid.clickHandler(new Vector(clickedX,clickedY),button,bg.grid.getSelected());
       clicked = false;
     }
     bg.grid.setSelected(bg.items.selected);

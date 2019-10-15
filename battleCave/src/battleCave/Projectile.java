@@ -11,6 +11,8 @@ public class Projectile extends GameObject{
     PhysVector v = new PhysVector(dir.getX()*speed,dir.getY()*speed);
     physics.setVelocity(v);
     addImageWithBoundingBox(ResourceManager.getImage(BounceGame.BASIC_PROJECTILE_RSC));
+    rotate((Math.toDegrees(Math.atan2(dir.getY(), dir.getX())))+180 );
+
   }
 
   public void update(int delta){

@@ -24,6 +24,7 @@ public class Physics {
     velocity = new PhysVector(vx,vy);
     acceleration = new PhysVector(0,0);
     force = new PhysVector(0,0);
+    maxAcceleration = 300f;
     this.mass = mass;
   }
 

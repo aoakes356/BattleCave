@@ -3,6 +3,7 @@ package battleCave;
 import jig.Collision;
 import jig.ResourceManager;
 import jig.Vector;
+import org.lwjgl.Sys;
 import org.newdawn.slick.Game;
 import org.newdawn.slick.Graphics;
 
@@ -109,7 +110,6 @@ public class Block extends GameObject {
           addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
           currentImage = BounceGame.BASIC_BLOCK_RSC;
         }
-        super.update(delta);
       }else {
         if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
           removeImage(ResourceManager.getImage(currentImage));
@@ -207,6 +207,7 @@ public class Block extends GameObject {
         }
         Block temp3;
         while (c != null) {
+          System.out.println("Stuck in Block collision loop");
           if(obj.get_id() == GameObject.BLOCK_ID){
             temp3 = (Block)obj;
             if(temp3.grounded && !grounded){
@@ -217,11 +218,20 @@ public class Block extends GameObject {
               c = collides(obj);
             }else{
               if(!isStatic && temp3.isStatic){
-                temp3.translate(c.getMinPenetration().scale(-.5f));
+                System.out.println("not static, and is static.");
+                translate(c.getMinPenetration().scale(.01f));
+                c = collides(obj);
+              }else if(grounded && temp3.grounded){
+                System.out.println("Both are grounded?");
+                translate(c.getMinPenetration().scale(.01f));
+                c = collides(obj);
+              }else if(!grounded && !temp3.grounded){
+                System.out.println("Both are !!NOT!! grounded?");
+                translate(c.getMinPenetration().scale(.01f));
+                System.out.println("minpen: "+c.getMinPenetration().getX()+", "+c.getMinPenetration().getY());
                 c = collides(obj);
               }else{
-                translate(c.getMinPenetration().scale(.5f));
-                c = collides(obj);
+                c = null;
               }
             }
           }else if(grounded) {

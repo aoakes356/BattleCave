@@ -215,6 +215,7 @@ public class Grid {
         return;
       }
       ArrayList<Cluster> clusters;
+      System.out.println("Button: " +button);
       if (button == 1) {
         activateBlock((int) e.getX(), (int) e.getY(), id);
       } else if (button == 0) {

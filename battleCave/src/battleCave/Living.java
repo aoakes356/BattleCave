@@ -19,6 +19,7 @@ public class Living extends GameObject{
   private boolean up;
   private boolean grounded;
   private Vector gridPosition;
+  private String currentImage;
   public Living(float x, float y) {
     super(x, y);
     left =  false;
@@ -27,7 +28,7 @@ public class Living extends GameObject{
     maxSpeed = 1.0f;
     health = 100;
     gridPosition = Grid.mapCoord(x,y,40);
-    physics.setMaxAcceleration(1.0f);
+    //physics.setMaxAcceleration(1.0f);
     addImageWithBoundingBox(ResourceManager.getImage(BounceGame.LIVING_THING_RSC));
 
   }
@@ -162,10 +163,16 @@ public class Living extends GameObject{
         grounded = true;
       }
       if(block || ground) {
+        int loops = 0;
         while (c != null) {
+          System.out.println("Stuck in the living collision loop.");
+          loops++;
           if (ground || block) {
-            translate(c.getMinPenetration().scale(.01f));
+            translate(c.getMinPenetration().scale(.1f));
             c = collides(obj);
+          }
+          if(loops > 100){
+            this.setPosition(Grid.coordMap((int)gridPosition.getX(),(int)gridPosition.getY(),40));
           }
         }
       }
