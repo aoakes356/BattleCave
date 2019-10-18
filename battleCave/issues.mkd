@@ -30,6 +30,7 @@ PHASE 1 Grid - (Low bar Complete)
 PHASE 2 Players and Monsters
 - **[23]** Implement player class, make basic art.
 - **[24]** Implement a Monster class, make basic art.
-- **[25]** Add a battle state.
-- **[26]** Add a way to transition between battle and building state.
-PHASE 3 Menus
+- **[25]** make target weights independent from monsters, make monsters follow path.
+- **[26]** Add a battle state.
+- **[27]** Add a way to transition between battle and building state.
+PHASE 3 Finish everything else
