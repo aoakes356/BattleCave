@@ -30,6 +30,7 @@ public class Living extends GameObject{
     gridPosition = Grid.mapCoord(x,y,40);
     //physics.setMaxAcceleration(1.0f);
     addImageWithBoundingBox(ResourceManager.getImage(BounceGame.LIVING_THING_RSC));
+    currentImage = BounceGame.LIVING_THING_RSC;
 
   }
 
@@ -172,6 +173,7 @@ public class Living extends GameObject{
             c = collides(obj);
           }
           if(loops > 100){
+            loops = 0;
             this.setPosition(Grid.coordMap((int)gridPosition.getX(),(int)gridPosition.getY(),40));
           }
         }
@@ -209,7 +211,22 @@ public class Living extends GameObject{
     this.jump = jump;
   }
 
+  public Vector getGridPos(){
+    return gridPosition;
+  }
+
   public static void settle(Living alive, int blockSize){
     alive.setY(Grid.coordMapY((int)alive.gridPosition.getY(),blockSize));
+  }
+
+  public String getCurrentImage() {
+    return currentImage;
+  }
+
+  public void setCurrentImage(String currentImage) {
+    removeImage(ResourceManager.getImage(getCurrentImage()));
+    removeShape(getShapes().get(0));
+    this.currentImage = currentImage;
+    addImageWithBoundingBox(ResourceManager.getImage(currentImage));
   }
 }

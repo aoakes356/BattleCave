@@ -51,6 +51,7 @@ class PlayingState extends BasicGameState {
 		bg.ground.render(g);
 		bg.items.render(g);
 		bg.creature.render(g);
+		bg.badGuy.render(g);
 		g.drawString("Money: " + bg.grid.money, 10, 30);
 		for (Bang b : bg.explosions)
 			b.render(g);
@@ -85,6 +86,7 @@ class PlayingState extends BasicGameState {
 	    itemPressed = !itemPressed;
     }
     bounceGame.creature.keyHandler(key,true);
+	  bounceGame.badGuy.keyHandler(key,true);
   }
 
   public void keyReleased(int key, char c){
@@ -123,6 +125,8 @@ class PlayingState extends BasicGameState {
 		bg.grid.update(delta);
 		bg.creature.update(delta);
     bg.creature.gridCollision(bg.grid,bg.ground);
+    bg.badGuy.update(delta);
+    bg.badGuy.gridCollision(bg.grid,bg.ground);
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
 

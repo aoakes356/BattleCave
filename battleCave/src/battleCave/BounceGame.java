@@ -63,6 +63,7 @@ public class BounceGame extends StateBasedGame {
   public static final String EMPTY_MENU_RSC = "battleCave/resource/ItemMenu.png";
   public static final String LIVING_THING_RSC = "battleCave/resource/survive.png";
   public static final String BASIC_PROJECTILE_RSC = "battleCave/resource/basicProjectile.png";
+  public static final String BASIC_MONSTER_RSC = "battleCave/resource/Monster.png";
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 
@@ -72,6 +73,7 @@ public class BounceGame extends StateBasedGame {
 	public Grid grid;
 	public ItemBar items;
 	public Player creature;
+	public Monster badGuy;
 	ArrayList<Bang> explosions;
 
 	/**
@@ -123,6 +125,7 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(EMPTY_MENU_RSC);
 		ResourceManager.loadImage(LIVING_THING_RSC);
 		ResourceManager.loadImage(BASIC_PROJECTILE_RSC);
+		ResourceManager.loadImage(BASIC_MONSTER_RSC);
     grid = new Grid(this,40);
     grid.setSelected(GameObject.EMPTY_BLOCK_ID);
 		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-16);
@@ -130,6 +133,8 @@ public class BounceGame extends StateBasedGame {
     block = new Block(ScreenWidth/3, ScreenHeight/3);
     items = new ItemBar(this);
     creature = new Player(ScreenWidth/2.0f,ScreenHeight/2.0f);
+    badGuy = new Monster(ScreenWidth/2.0f,ScreenHeight/2.0f, grid);
+    badGuy.setTarget(creature);
 	}
 
 	public static void main(String[] args) {

@@ -235,7 +235,7 @@ public class Block extends GameObject {
               }
             }
           }else if(grounded) {
-            translate(c.getMinPenetration().scale(.5f));
+            translate(c.getMinPenetration().scale(.01f));
             c = collides(obj);
           }else{
             c = null;

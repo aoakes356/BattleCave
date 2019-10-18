@@ -13,6 +13,7 @@ public class EmptyBlock extends Block{
     superOnly = true;
     gridX = Grid.mapCoordX(x,40);
     gridY = Grid.mapCoordY(y,40);
+    health = 0;
     removeImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
     addImage(ResourceManager.getImage(BounceGame.EMPTY_BLOCK_RSC));
     currentImage = BounceGame.EMPTY_BLOCK_RSC;

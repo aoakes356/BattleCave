@@ -474,6 +474,30 @@ public class Grid {
     mode = m;
   }
 
+  public Block getAnyBlock(Vector v){
+    return getAnyBlock((int)v.getX(),(int)v.getY());
+  }
+
+  public Block getAnyBlock(int x, int y){
+    if(x < blocks.size() && y < blocks.get(x).size()) {
+      Block temp = blocks.get(x).get(y);
+      return temp;
+    }
+    return null;
+  }
+
+  public Block getBlock(int x, int y){
+    if(x < blocks.size() && y < blocks.get(x).size()) {
+      Block temp = blocks.get(x).get(y);
+      if(temp.get_id() != GameObject.EMPTY_BLOCK_ID){
+        return temp;
+      }else{
+        return null;
+      }
+    }
+    return null;
+  }
+
   public int getSelected() {
     return selected;
   }
