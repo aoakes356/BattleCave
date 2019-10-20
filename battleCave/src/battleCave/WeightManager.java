@@ -36,6 +36,7 @@ public class WeightManager {
     }else if((int)blockPos.getY() > (int)startPos.getY() && (int)blockPos.getX() == (int)startPos.getX()){
       weight += 110;// Straight up is bad.
     }else{
+      weight += 10;
     }
 
     return weight;
