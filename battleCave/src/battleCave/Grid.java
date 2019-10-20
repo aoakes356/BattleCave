@@ -25,6 +25,7 @@ public class Grid {
   private int selected;
   private ArrayList<Cluster> chunks;
   private int blockCount;
+  public boolean changed;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
     money = 10000;
@@ -38,6 +39,7 @@ public class Grid {
     ArrayList<Block> temp;
     chunks = new ArrayList<>();
     pressed = false;
+    changed = true;
     for(int i = 0; i < width; i++){
       temp = new ArrayList<>();
       blocks.add(temp);
@@ -136,11 +138,17 @@ public class Grid {
   public void update(int delta){
     Block temp;
     int previous;
+    ArrayList<Cluster> clusters;
     ArrayList<Block> visited = new ArrayList<>();
     for(int i = 0; i < this.blocks.size(); i++){
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
-        if(temp != null) {
+        if(!temp.getActive()){
+          clusters = destroyBlock(temp.gridX,temp.gridY);
+          if(clusters != null){
+            chunks.addAll(clusters);
+          }
+        }else if(temp != null) {
           previous = temp.gridY;
           temp.update(delta);
           if (temp.gridX < width && temp.gridY < height) {
@@ -167,6 +175,7 @@ public class Grid {
       }
     }
     if(chunks.size() > 0){
+      changed = true;
       System.out.println("falling chunks.");
     }
   }
@@ -284,6 +293,7 @@ public class Grid {
         findNeighbors(nblock);
         money -= nblock.cost;
         blockCount++;
+        changed = true;
       }
 
     }
@@ -372,6 +382,7 @@ public class Grid {
     if(start != null && start.get_id() != GameObject.EMPTY_BLOCK_ID){
       money += start.cost;
       blockCount--;
+      changed = true;
       ArrayList<Block> visitedUp = new ArrayList<>();
       ArrayList<Block> visitedDown = new ArrayList<>();
       ArrayList<Block> visitedLeft = new ArrayList<>();
@@ -505,4 +516,28 @@ public class Grid {
   public void setSelected(int selected) {
     this.selected = selected;
   }
+
+  public void setChanged(boolean change){
+    changed = change;
+  }
+
+  public Block getNearestBlock(Vector pos){
+    float dist;
+    float min = 10000000;
+    Block nearest = null;
+    for(ArrayList<Block> column: blocks){  // Naive approach for now.
+      for(Block b: column) {
+        if (b.get_id() != GameObject.EMPTY_BLOCK_ID) {
+          dist = b.getGridPos().subtract(pos).length();
+          if (dist < min && ((nearest == null) || nearest.getY() < b.getY())) {
+            min = dist;
+            nearest = b;
+          }
+        }
+      }
+    }
+    return nearest;
+  }
+
+
 }

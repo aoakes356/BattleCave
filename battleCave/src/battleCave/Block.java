@@ -191,6 +191,7 @@ public class Block extends GameObject {
     }*/
     Collision c = collides(obj);
     boolean collide = true;
+    int loops = 0;
     if(obj != this) {
       if (c != null) {
         if (obj.get_id() == GameObject.GROUND_ID || obj.get_id() == GameObject.BLOCK_ID) {
@@ -207,6 +208,7 @@ public class Block extends GameObject {
         }
         Block temp3;
         while (c != null) {
+          loops ++;
           System.out.println("Stuck in Block collision loop");
           if(obj.get_id() == GameObject.BLOCK_ID){
             temp3 = (Block)obj;
@@ -239,6 +241,9 @@ public class Block extends GameObject {
             c = collides(obj);
           }else{
             c = null;
+          }
+          if(loops > 100){
+            break;
           }
         }
       }
@@ -293,8 +298,25 @@ public class Block extends GameObject {
     hasCluster = cluster;
   }
 
+  public boolean isStatic(){
+    return isStatic;
+  }
+
+  public void damage(int damage){
+    health -= damage;
+    if(get_id() != GameObject.EMPTY_BLOCK_ID){
+      if(health < 0){
+        health = 0;
+        active = false;
+      }
+    }
+  }
+
   @Override
   public int get_id(){
     return GameObject.BLOCK_ID;
+  }
+  public Vector getGridPos(){
+    return new Vector(gridX,gridY);
   }
 }

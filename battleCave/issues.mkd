@@ -25,12 +25,12 @@
 - **[20]** Add a material selection bar.
 - **[21]** Fix bug that causes blocks to overlap after collisions sometimes.
 - **[22]** Implement a super class that will be extended by player and monster classes.
-
-PHASE 1 Grid - (Low bar Complete)
-PHASE 2 Players and Monsters
 - **[23]** Implement player class, make basic art.
 - **[24]** Implement a Monster class, make basic art.
 - **[25]** make target weights independent from monsters, make monsters follow path.
+
+PHASE 1 Grid - (Low bar Complete)
+PHASE 2 Players and Monsters
 - **[26]** Add a battle state.
 - **[27]** Add a way to transition between battle and building state.
 PHASE 3 Finish everything else

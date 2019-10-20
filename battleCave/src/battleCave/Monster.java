@@ -10,41 +10,32 @@ import java.util.*;
 
 public class Monster extends Living {
   public ArrayList<Vector> cachedPath;
-  private static final float diagonal =(float) Math.sqrt(2);
   public Vector nextBlock;
+  private static final float diagonal =(float) Math.sqrt(2);
   public Living target;
+  public Block secondary;
+  public boolean live;
+  public boolean b;
   private Grid grid;
+  private WeightManager weightManager;
   public boolean drawPath;
-  public Monster(float x, float y, Grid g) {
-    super(x, y);
+  public Monster(float x, float y, Grid g, WeightManager w) {
+    super(x, y, g);
     grid = g;
     setCurrentImage(BounceGame.BASIC_MONSTER_RSC);
     target = null;
     drawPath = false;
     cachedPath = new ArrayList<>();
+    weightManager = w;
+    b =false;
+    live = true;
+    setSpeed(.5f);
+    setNoClimbing(true);
   }
 
   public void keyHandler(int key, boolean pressed){
     if(key == Input.KEY_ENTER){
-      try {
-        generatePath();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
     }
-  }
-
-  public float edgeWeight(Vector blockPos){
-    float dist = target.getGridPos().subtract(blockPos).length();
-    float health = grid.getAnyBlock(blockPos).health;
-    float weight = dist + health;
-    if((int)blockPos.getX() != (int)getGridPos().getX() && (int)blockPos.getY() != (int)getGridPos().getY()){
-      weight += diagonal*10;
-    }else{
-      weight += 10;
-    }
-
-    return weight;
   }
 
   public Float getWeight(Vector v,ArrayList<ArrayList<Float>> weights){
@@ -82,6 +73,54 @@ public class Monster extends Living {
     return neighbors;
   }
 
+  public void followPath(){
+    if(cachedPath != null && cachedPath.size() > 0) {
+      Vector next = cachedPath.get(0);
+      Block nextBlock = grid.getAnyBlock(next);
+      if(nextBlock.get_id() != GameObject.EMPTY_BLOCK_ID && !nextBlock.isStatic()){
+        // Diagonal
+        // Attack it stair case order.
+        nextBlock.damage(1);
+        if(live) {
+          if (nextBlock.below != null) {
+            nextBlock.below.damage(1);
+          }
+          if (nextBlock.above != null) {
+            nextBlock.above.damage(1);
+          }
+        }
+      }
+      if(next.getX() > getGridPos().getX()){
+        goRight = true;
+      }else{
+        goRight = false;
+      }if(next.getX() < getGridPos().getX()){
+        goLeft = true;
+      }else{
+        goLeft = false;
+      }
+      if(next.getY() > getGridPos().getY()){
+        up = false;
+      }else if(next.getY() < getGridPos().getY()){
+        if((int)next.getX() == (int)getGridPos().getX() && (target.isGrounded() || target.isClimbing())){
+          // Change target to nearest block, this character can't go straight up.
+          System.out.println("!!!!!!!!!Changing targets!!!!!!!!!!!!");
+          Block b = grid.getNearestBlock(getGridPos());
+          secondary = b;
+          if(b != null) {
+            weightManager.setTarget(b);
+            live = false;
+            this.b = true;
+          }
+        }
+        up = true;
+      }else{
+        up = false;
+      }
+
+    }
+  }
+
   public Vector getLowestNeighbor(Vector blockPos, ArrayList<ArrayList<Float>> weights, ArrayList<Vector> visited){
     ArrayList<Vector> neighbors = getNeighbors(blockPos);
     Vector lowest = null;
@@ -99,96 +138,28 @@ public class Monster extends Living {
     return lowest;
   }
 
-  public void setNeighbors(Vector blockPos, ArrayList<ArrayList<Float>> weights) throws Exception {
-    ArrayList<Vector> neighbors = getNeighbors(blockPos);
-    float currentWeight = getWeight(blockPos,weights);
-    //System.out.println(currentWeight);
-    float neighborWeight;
-    float edge;
-    for(Vector neighbor: neighbors) {
-      if (grid.getAnyBlock(neighbor) != null) {
-        neighborWeight = getWeight(neighbor, weights);
-        edge = edgeWeight(neighbor);
-        //System.out.println("Edge: "+edge);
-        if (edge + currentWeight < neighborWeight) {
-          setWeight(edge + currentWeight, neighbor, weights);
-        }
-      }else{
-        setWeight(100000000f,neighbor,weights);
-      }
-    }
-  }
 
-  private static boolean contains(Vector v, ArrayList<Vector> vectors){
-    for(Vector temp: vectors){
-      if(((int)v.getX())==((int)temp.getX()) && ((int)v.getY())==((int)temp.getY()) ){
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void generatePath() throws Exception {
-
-    if(target != null && target.getGridPos() != null && getGridPos() != null){
-      // A*
-      ArrayList<Vector> visited = new ArrayList<>();
-      ArrayList<ArrayList<Float>> weights = new ArrayList<>();
-      ArrayList<Vector> neighbors;
-      for(int i = 0; i < grid.blocks.size(); i++){
-        weights.add(new ArrayList<>(grid.blocks.get(0).size()));
-        for(int j = 0; j < grid.blocks.get(0).size(); j++){
-          weights.get(i).add(100000000f);   // Initialize all weights to a big value.
-        }
-      }
-      Vector targetPos = target.getGridPos();
-      Comparator<Vector> vectorComparator = new Comparator<Vector>() {
-        @Override
-        public int compare(Vector o1, Vector o2) {
-          return (int)(weights.get((int)o1.getX()).get((int)o1.getY())-weights.get((int)o2.getX()).get((int)o2.getY()));
-        }
-      };
-      PriorityQueue<Vector> p = new PriorityQueue<>(10, vectorComparator);
-      p.add(targetPos);
-      Vector next;
-      boolean start = true;
-      while (!p.isEmpty()){
-        next = p.remove();
-        if(start){
-          setWeight(0,next,weights);
-          start = false;
-        }
-        setNeighbors(next,weights);
-        neighbors = getNeighbors(next);
-        for(Vector neighbor: neighbors){
-          if(!visited.contains(neighbor)){
-            p.add(neighbor);
-            visited.add(neighbor);
-          }else{
-            System.out.println("redundant");
-          }
-        }
-        if((int)next.getX() == (int)getGridPos().getX() && (int)next.getY() == (int)getGridPos().getY()){
-          break;
-        }
-        System.out.println("Next Node!");
-      }
-      for(ArrayList<Float> row:weights){
-        //System.out.println(row);
-      }
+  public void generatePath(ArrayList<ArrayList<Float>> weights){
       cachedPath = new ArrayList<>();
-      next = getGridPos();
-      targetPos = target.getGridPos();
-      while(!(next.getX() == targetPos.getX() && next.getY() == targetPos.getY())){
-        next = getLowestNeighbor(next,weights,cachedPath);
-        if(next == null){
-          return;
-        }
-        cachedPath.add(next);
-        System.out.println("caching!!");
+      Vector next = getGridPos();
+      Vector targetPos;
+      if(live) {
+        targetPos=target.getGridPos();
+      }else if(b){
+        targetPos = secondary.getGridPos();
+      }else{
+        targetPos = null;
       }
-
-    }
+      if(targetPos != null) {
+        while (!(next.getX() == targetPos.getX() && next.getY() == targetPos.getY())) {
+          next = getLowestNeighbor(next, weights, cachedPath);
+          if (next == null) {
+            return;
+          }
+          cachedPath.add(next);
+          System.out.println("caching!!");
+        }
+      }
   }
 
   public static void drawPath(Graphics g, Block a, Block b, ArrayList<Block> visited){
@@ -207,6 +178,7 @@ public class Monster extends Living {
     Block current = null, previous = null;
     //System.out.println(cachedPath);
     for(Vector v: cachedPath){
+      g.drawString(weightManager.getWeight(v)+"",Grid.coordMapX((int)v.getX(),40),Grid.coordMapY((int)v.getY(),40));
       previous = current;
       current = grid.getAnyBlock(v);
       if(previous != null){
@@ -221,12 +193,14 @@ public class Monster extends Living {
 
   public void update(int delta){
     super.update(delta);
-   try {
-      generatePath();
-    } catch (Exception e) {
-      e.printStackTrace();
+    if((secondary == null || !secondary.getActive() )&& !live){
+      weightManager.setTarget(target);
+      live = true;
+      b = false;
+      secondary = null;
     }
-    //System.out.println(cachedPath);
+    generatePath(weightManager.getWeights());
+    followPath();
   }
 
   public void render(Graphics g){

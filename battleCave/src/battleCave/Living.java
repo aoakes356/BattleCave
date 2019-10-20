@@ -10,27 +10,34 @@ import java.util.ArrayList;
 
 public class Living extends GameObject{
   private int health;
+  private boolean noClimbing;
   private float maxSpeed;
   private float jump;
   private boolean left;
-  private boolean goLeft;
-  private boolean goRight;
+  public boolean goLeft;
+  public boolean goRight;
   private boolean crouch;
-  private boolean up;
+  public boolean up;
   private boolean grounded;
   private Vector gridPosition;
+  private Vector previousGridPosition;
   private String currentImage;
-  public Living(float x, float y) {
+  private boolean climbing;
+  private Grid grid;
+  public Living(float x, float y, Grid g) {
     super(x, y);
     left =  false;
+    grid = g;
     crouch = false;
-    jump = 1.2f;
+    jump = 1.0f;
     maxSpeed = 1.0f;
     health = 100;
     gridPosition = Grid.mapCoord(x,y,40);
     //physics.setMaxAcceleration(1.0f);
     addImageWithBoundingBox(ResourceManager.getImage(BounceGame.LIVING_THING_RSC));
     currentImage = BounceGame.LIVING_THING_RSC;
+    climbing = false;
+    noClimbing = false;
 
   }
 
@@ -66,23 +73,43 @@ public class Living extends GameObject{
 
   @Override
   public void update(int delta){
+    if(noClimbing){
+      climbing = false;
+    }
+    previousGridPosition = gridPosition;
     gridPosition = Grid.mapCoord(getX(),getY(),40);
+    if(gridPosition.getX() < 0){
+      gridPosition.setX(0);
+    }else if(gridPosition.getX() > grid.width-1){
+      gridPosition.setX(grid.width-1);
+    }if(gridPosition.getY() < 0){
+      gridPosition.setY(0);
+    }else if(gridPosition.getY() > grid.height-1){
+      gridPosition.setY(grid.height-1);
+    }
     if(goLeft){
-      physics.addForce(-.005f, 0);
+      physics.addForce(-.005f*maxSpeed, 0);
     }else if(goRight){
-      physics.addForce(.005f, 0);
+      physics.addForce(.005f*maxSpeed, 0);
     }if(up){
-      if(grounded) {
-        physics.addForce(0, -.08f);
+      if(grounded || climbing) {
+        physics.setVelocity(new PhysVector( physics.velocity.x,-1.3f*jump));
         grounded = false;
       }
       up = false;
     }
-    super.update(delta);
-    super.physics.addForce(super.physics.velocity.cloneVec().scale(-.01f));
-    if(!grounded) {
-      super.physics.addAcceleration(0, .000981f * 6);
+    super.physics.addForce(super.physics.velocity.cloneVec().scale((-.01f)));
+    if(!grounded && !climbing) {
+      super.physics.addAcceleration(0, (.000981f) * 6);
+    }else if(!climbing){
+      this.setPosition(getX(),Grid.coordMapY((int)gridPosition.getY(),40));
     }
+    if(previousGridPosition.getX() != gridPosition.getX() || previousGridPosition.getY() != gridPosition.getY() || grid.changed){
+      grounded = false;
+      climbing = false;
+    }
+    super.update(delta);
+
 
   }
 
@@ -141,10 +168,8 @@ public class Living extends GameObject{
     boolean c8 =collisionTest(g.blocks.get(gx).get(gy));
     boolean c9 = collisionTest(ground);
     if(c1||c2||c3||c4||c5||c6||c7||c8||c9){
-      grounded = true;
       return true;
     }
-    grounded = false;
     return false;
   }
 
@@ -161,7 +186,11 @@ public class Living extends GameObject{
       }else if(obj.get_id() == GameObject.BLOCK_ID){
         block = true;
         Block b = (Block)obj;
-        grounded = true;
+        if(b.gridX == (int)gridPosition.getX()) {
+          grounded = true;
+        }else if((b.gridX > (int)gridPosition.getX() && goRight) ||(b.gridX < (int)gridPosition.getX() && goLeft)){
+          climbing = true;
+        }
       }
       if(block || ground) {
         int loops = 0;
@@ -172,9 +201,11 @@ public class Living extends GameObject{
             translate(c.getMinPenetration().scale(.1f));
             c = collides(obj);
           }
-          if(loops > 100){
-            loops = 0;
-            this.setPosition(Grid.coordMap((int)gridPosition.getX(),(int)gridPosition.getY(),40));
+          if(loops > 1000){
+            PhysVector dir = new PhysVector(getPosition().subtract(obj.getPosition()).unit());
+            physics.setVelocity(dir.scale(1/dir.length()));
+            //this.setPosition(Grid.coordMap((int)gridPosition.getX(),(int)gridPosition.getY(),40));
+            break;
           }
         }
       }
@@ -229,4 +260,17 @@ public class Living extends GameObject{
     this.currentImage = currentImage;
     addImageWithBoundingBox(ResourceManager.getImage(currentImage));
   }
+
+  public void setNoClimbing(boolean c){
+    noClimbing = c;
+  }
+
+  public boolean isGrounded(){
+    return grounded;
+  }
+
+  public boolean isClimbing(){
+    return climbing;
+  }
+
 }

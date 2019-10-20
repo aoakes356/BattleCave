@@ -120,6 +120,8 @@ class PlayingState extends BasicGameState {
       bg.grid.clickHandler(new Vector(clickedX,clickedY),button,bg.grid.getSelected());
       clicked = false;
     }
+    Vector temp1 = bg.creature.getGridPos();
+    Vector temp2;
     bg.grid.setSelected(bg.items.selected);
 		bg.grid.collision(bg.ground);
 		bg.grid.update(delta);
@@ -127,6 +129,11 @@ class PlayingState extends BasicGameState {
     bg.creature.gridCollision(bg.grid,bg.ground);
     bg.badGuy.update(delta);
     bg.badGuy.gridCollision(bg.grid,bg.ground);
+    temp2 = bg.creature.getGridPos();
+    if(temp1.getX() != temp2.getX() || temp1.getY() != temp2.getY() || bg.grid.changed){
+      bg.weightMgr.generatePath();
+      bg.grid.setChanged(false);
+    }
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
 

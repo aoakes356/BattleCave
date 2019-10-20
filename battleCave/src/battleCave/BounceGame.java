@@ -72,6 +72,7 @@ public class BounceGame extends StateBasedGame {
 	public Block block;
 	public Grid grid;
 	public ItemBar items;
+	public WeightManager weightMgr;
 	public Player creature;
 	public Monster badGuy;
 	ArrayList<Bang> explosions;
@@ -132,8 +133,9 @@ public class BounceGame extends StateBasedGame {
 		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .1f, .2f);
     block = new Block(ScreenWidth/3, ScreenHeight/3);
     items = new ItemBar(this);
-    creature = new Player(ScreenWidth/2.0f,ScreenHeight/2.0f);
-    badGuy = new Monster(ScreenWidth/2.0f,ScreenHeight/2.0f, grid);
+    creature = new Player(ScreenWidth/2.0f,ScreenHeight/2.0f,grid);
+    weightMgr = new WeightManager(grid,creature);
+    badGuy = new Monster(ScreenWidth/2.0f,ScreenHeight/2.0f, grid, weightMgr);
     badGuy.setTarget(creature);
 	}
 

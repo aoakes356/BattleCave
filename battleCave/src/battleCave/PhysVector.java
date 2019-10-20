@@ -13,6 +13,9 @@ public class PhysVector {
     this.x = x;
     this.y = y;
    }
+   public PhysVector(Vector v){
+    this(v.getX(),v.getY());
+   }
 
   public void add(PhysVector v){
     this.x += v.x;

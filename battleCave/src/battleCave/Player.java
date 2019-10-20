@@ -9,8 +9,8 @@ public class Player extends Living {
 
   ArrayList<Projectile> projectiles;
 
-  public Player(float x, float y) {
-    super(x, y);
+  public Player(float x, float y, Grid g) {
+    super(x, y, g);
     projectiles = new ArrayList<>();
   }
 
