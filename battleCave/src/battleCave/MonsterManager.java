@@ -80,6 +80,7 @@ public class MonsterManager {
       m.update(delta);
       m.gridCollision(grid,ground);
       if(m.getHealth() < 0){
+        grid.addMoney(m.getPrice());
         it.remove();
       }
     }
@@ -88,6 +89,10 @@ public class MonsterManager {
       s1 = new Spawn(v);
       grid.forceBlock(s1.gridX,s1.gridY,s1);
     }
+  }
+
+  public void killAll(){
+    monsters.clear();
   }
 
   public void render(Graphics g){

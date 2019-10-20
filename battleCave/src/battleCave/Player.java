@@ -8,14 +8,18 @@ import java.util.Iterator;
 
 public class Player extends Living {
 
-  ArrayList<Projectile> projectiles;
-  Ground ground;
-  MonsterManager manager;
+  private ArrayList<Projectile> projectiles;
+  private Ground ground;
+  private MonsterManager manager;
+  private HealthBar health;
   public Player(float x, float y, Grid g, Ground grnd, MonsterManager m) {
     super(x, y, g);
     ground = grnd;
     manager = m;
     projectiles = new ArrayList<>();
+    setMaxHealth(150);
+    setHealth(150);
+    health = new HealthBar(-getHealth()/2.0f,-35f,this);
   }
 
   public void attack(Vector dir){
@@ -47,14 +51,17 @@ public class Player extends Living {
         it.remove();
       }
     }
+    health.update(delta);
   }
 
   public void render(Graphics g){
     super.render(g);
+    health.render(g);
     for(Projectile p : projectiles){
       p.render(g);
     }
   }
+
 
   public int get_id(){
     return GameObject.PLAYER_ID;

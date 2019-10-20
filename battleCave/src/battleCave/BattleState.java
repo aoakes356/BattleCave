@@ -107,6 +107,9 @@ public class BattleState extends BasicGameState {
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
 		bg.mmgr.update(delta);
+		if(bg.creature.getHealth() <= 0){
+		  bg.enterState(BounceGame.PLAYINGSTATE);
+    }
 
   }
 }

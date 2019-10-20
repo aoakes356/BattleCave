@@ -42,6 +42,11 @@ class PlayingState extends BasicGameState {
 		itemPressed = false;
 		clicked = false;
 		bounceGame = (BounceGame)game;
+    bounceGame.grid.setMode(Grid.BUILD_MODE);
+    bounceGame.mmgr.setAutoSpawn(false);
+    bounceGame.mmgr.killAll();
+    bounceGame.creature.setHealth(bounceGame.creature.getMaxHealth());
+
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,

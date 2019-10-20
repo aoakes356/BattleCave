@@ -17,8 +17,10 @@ public class Monster extends Living {
   public boolean live;
   public boolean b;
   private Grid grid;
+  private int price;
   private WeightManager weightManager;
   public boolean drawPath;
+  private HealthBar h;
   public Monster(float x, float y, Grid g, WeightManager w) {
     super(x, y, g);
     grid = g;
@@ -27,10 +29,12 @@ public class Monster extends Living {
     drawPath = false;
     cachedPath = new ArrayList<>();
     weightManager = w;
+    price = 10;
     b =false;
     live = true;
     setSpeed(.5f);
     setNoClimbing(true);
+    h = new HealthBar(-maxHealth/2.0f,-35,this);
   }
 
   public void keyHandler(int key, boolean pressed){
@@ -76,6 +80,12 @@ public class Monster extends Living {
   public void followPath(){
     if(cachedPath != null && cachedPath.size() > 0) {
       Vector next = cachedPath.get(0);
+      if(cachedPath.size() <= 1){
+        if(live){
+          System.out.println("DAAAMAMAMMAMAMAAAGGGIIINNGG!!!");
+          target.damage(1);
+        }
+      }
       Block nextBlock = grid.getAnyBlock(next);
       if(nextBlock.get_id() != GameObject.EMPTY_BLOCK_ID && !nextBlock.isStatic()){
         // Diagonal
@@ -107,7 +117,7 @@ public class Monster extends Living {
           System.out.println("!!!!!!!!!Changing targets!!!!!!!!!!!!");
           Block b = grid.getNearestBlock(getGridPos());
           secondary = b;
-          if(b != null) {
+          if(b != null && b.getActive()) {
             weightManager.setTarget(b);
             live = false;
             this.b = true;
@@ -193,17 +203,23 @@ public class Monster extends Living {
 
   public void update(int delta){
     super.update(delta);
+    h.update(delta);
     if((secondary == null || !secondary.getActive() )&& !live){
       weightManager.setTarget(target);
       live = true;
       b = false;
       secondary = null;
+    }else if(b && secondary!=null&&secondary.getActive()){
+      if(weightManager.live){
+        weightManager.setTarget(secondary);
+      }
     }
     generatePath(weightManager.getWeights());
     followPath();
   }
 
   public void render(Graphics g){
+    h.render(g);
     super.render(g);
     path(g);
   }
@@ -212,4 +228,11 @@ public class Monster extends Living {
     return GameObject.MONSTER1_ID;
   }
 
+  public int getPrice() {
+    return price;
+  }
+
+  public void setPrice(int p){
+    price = p;
+  }
 }

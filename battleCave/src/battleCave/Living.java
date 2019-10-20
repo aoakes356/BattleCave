@@ -24,6 +24,7 @@ public class Living extends GameObject{
   private String currentImage;
   private boolean climbing;
   public Grid grid;
+  public int maxHealth;
   public Living(float x, float y, Grid g) {
     super(x, y);
     left =  false;
@@ -32,6 +33,7 @@ public class Living extends GameObject{
     jump = 1.0f;
     maxSpeed = 1.0f;
     health = 100;
+    maxHealth = health;
     gridPosition = Grid.mapCoord(x,y,40);
     //physics.setMaxAcceleration(1.0f);
     addImageWithBoundingBox(ResourceManager.getImage(BounceGame.LIVING_THING_RSC));
@@ -226,6 +228,12 @@ public class Living extends GameObject{
     this.health = health;
   }
 
+  public int getMaxHealth(){return maxHealth;}
+
+  public void setMaxHealth(int max){
+    maxHealth = max;
+  }
+
   public float getSpeed() {
     return maxSpeed;
   }
@@ -273,4 +281,7 @@ public class Living extends GameObject{
     return climbing;
   }
 
+  public void damage(int d){
+    setHealth(getHealth()-d);
+  }
 }
