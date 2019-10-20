@@ -58,6 +58,7 @@ class PlayingState extends BasicGameState {
 		bg.items.render(g);
 		bg.creature.render(g);
 		bg.mmgr.render(g);
+		bg.battlebtn.render(g);
 		g.drawString("Money: " + bg.grid.money, 10, 30);
 	}
 
@@ -104,6 +105,7 @@ class PlayingState extends BasicGameState {
 			int delta) throws SlickException {
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
+		bg.battlebtn.update(delta);
 		//bg.block.collision(bg.ground);
     if(pressed && !bg.items.isActive()){
       bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button, bg.grid.getSelected());
@@ -116,6 +118,7 @@ class PlayingState extends BasicGameState {
       bg.items.setActive(false);
     }
     if(clicked){
+      bg.battlebtn.clickHandler(clickedX,clickedY,button,bg);
      //bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
     }
     if(bg.items.isActive() && clicked){

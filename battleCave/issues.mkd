@@ -36,8 +36,10 @@ PHASE 2 Players and Monsters
 - **[28]** Take damage from the enemy when they are close enough.
 - **[29]** Add a way to transition between battle and building state(a button or something.).
 - **[30]** upon death, enter back into the building state with the newly acquired funds.
+- **[31]** Make spawn points impossible to occupy with other blocks.
 PHASE 3 Finish everything else
 - **[31]** Finish the block selection menu.
 - **[32]** Add new blocks, most important, add a window that you can shoot through. blocks are basically useless without that.
-- **[33]** Make pathing info togglable.
+- **[33]** Make pathing info toggleable.
+- **[34]** Add more kinds of enemies.
 
