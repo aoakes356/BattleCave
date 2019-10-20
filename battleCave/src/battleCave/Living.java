@@ -23,7 +23,7 @@ public class Living extends GameObject{
   private Vector previousGridPosition;
   private String currentImage;
   private boolean climbing;
-  private Grid grid;
+  public Grid grid;
   public Living(float x, float y, Grid g) {
     super(x, y);
     left =  false;

@@ -208,6 +208,8 @@ public class Monster extends Living {
     path(g);
   }
 
-
+  public int get_id(){
+    return GameObject.MONSTER1_ID;
+  }
 
 }

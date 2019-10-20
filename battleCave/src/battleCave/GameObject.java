@@ -11,6 +11,10 @@ public class GameObject extends Entity {
   public static final int GROUND_ID = 1;
   public static final int BLOCK_ID = 2;
   public static final int EMPTY_BLOCK_ID = 3;
+  public static final int SPAWN_BLOCK_ID = 4;
+  public static final int PLAYER_ID = 5;
+  public static final int MONSTER1_ID = 6;
+  public static final int PROJECTILE_ID = 7;
   public  Physics physics;
 
   public GameObject(final float x, final float y){

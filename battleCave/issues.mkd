@@ -32,5 +32,8 @@
 PHASE 1 Grid - (Low bar Complete)
 PHASE 2 Players and Monsters
 - **[26]** Add a battle state.
-- **[27]** Add a way to transition between battle and building state.
+- **[27]** Get money from slaying the enemy.
+- **[28]** Take damage from the enemy when they are close enough.
+- **[29]** Add a way to transition between battle and building state(a button or something.).
+- **[30]** upon death, enter back into the building state with the newly acquired funds.
 PHASE 3 Finish everything else

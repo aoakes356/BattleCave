@@ -48,6 +48,7 @@ public class BounceGame extends StateBasedGame {
 	public static final int STARTUPSTATE = 0;
 	public static final int PLAYINGSTATE = 1;
 	public static final int GAMEOVERSTATE = 2;
+	public static final int BATTLESTATE = 3;
 	
 	public static final String BALL_BALLIMG_RSC = "battleCave/resource/ball.png";
 	public static final String BALL_BROKENIMG_RSC = "battleCave/resource/brokenball.png";
@@ -64,6 +65,7 @@ public class BounceGame extends StateBasedGame {
   public static final String LIVING_THING_RSC = "battleCave/resource/survive.png";
   public static final String BASIC_PROJECTILE_RSC = "battleCave/resource/basicProjectile.png";
   public static final String BASIC_MONSTER_RSC = "battleCave/resource/Monster.png";
+  public static final String SPAWN_POINT_RSC = "battleCave/resource/SpawnPoint.png";
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 
@@ -74,7 +76,7 @@ public class BounceGame extends StateBasedGame {
 	public ItemBar items;
 	public WeightManager weightMgr;
 	public Player creature;
-	public Monster badGuy;
+	public MonsterManager mmgr;
 	ArrayList<Bang> explosions;
 
 	/**
@@ -104,7 +106,7 @@ public class BounceGame extends StateBasedGame {
 		addState(new StartUpState());
 		addState(new GameOverState());
 		addState(new PlayingState());
-		
+	  addState(new BattleState());
 		// the sound resource takes a particularly long time to load,
 		// we preload it here to (1) reduce latency when we first play it
 		// and (2) because loading it will load the audio libraries and
@@ -127,16 +129,18 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(LIVING_THING_RSC);
 		ResourceManager.loadImage(BASIC_PROJECTILE_RSC);
 		ResourceManager.loadImage(BASIC_MONSTER_RSC);
+		ResourceManager.loadImage(SPAWN_POINT_RSC);
     grid = new Grid(this,40);
     grid.setSelected(GameObject.EMPTY_BLOCK_ID);
 		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-16);
 		ball = new Ball(ScreenWidth / 2, ScreenHeight / 2, .1f, .2f);
     block = new Block(ScreenWidth/3, ScreenHeight/3);
     items = new ItemBar(this);
-    creature = new Player(ScreenWidth/2.0f,ScreenHeight/2.0f,grid);
-    weightMgr = new WeightManager(grid,creature);
-    badGuy = new Monster(ScreenWidth/2.0f,ScreenHeight/2.0f, grid, weightMgr);
-    badGuy.setTarget(creature);
+    weightMgr = new WeightManager(grid,null);
+    mmgr = new MonsterManager(grid,weightMgr,ground);
+    creature = new Player(ScreenWidth/2.0f,ScreenHeight/2.0f,grid,ground,mmgr);
+    mmgr.setTarget(creature);
+    weightMgr.setTarget(creature);
 	}
 
 	public static void main(String[] args) {

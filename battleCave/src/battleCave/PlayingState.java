@@ -1,5 +1,6 @@
 package battleCave;
 
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.Iterator;
 
 import jig.Vector;
@@ -51,10 +52,8 @@ class PlayingState extends BasicGameState {
 		bg.ground.render(g);
 		bg.items.render(g);
 		bg.creature.render(g);
-		bg.badGuy.render(g);
+		bg.mmgr.render(g);
 		g.drawString("Money: " + bg.grid.money, 10, 30);
-		for (Bang b : bg.explosions)
-			b.render(g);
 	}
 
 
@@ -84,9 +83,10 @@ class PlayingState extends BasicGameState {
   public void keyPressed(int key, char c){
 	  if(key == Input.KEY_I){
 	    itemPressed = !itemPressed;
+    }else if(key == Input.KEY_ENTER){
+      bounceGame.enterState(BounceGame.BATTLESTATE);
     }
     bounceGame.creature.keyHandler(key,true);
-	  bounceGame.badGuy.keyHandler(key,true);
   }
 
   public void keyReleased(int key, char c){
@@ -127,8 +127,11 @@ class PlayingState extends BasicGameState {
 		bg.grid.update(delta);
 		bg.creature.update(delta);
     bg.creature.gridCollision(bg.grid,bg.ground);
-    bg.badGuy.update(delta);
-    bg.badGuy.gridCollision(bg.grid,bg.ground);
+    if(bg.creature.getPosition().getX() > bg.ScreenWidth-10){
+      bg.creature.setX(bg.ScreenWidth-10);
+    }if(bg.creature.getPosition().getY() > bg.ScreenHeight-10){
+      bg.creature.setY(bg.ScreenHeight-10);
+    }
     temp2 = bg.creature.getGridPos();
     if(temp1.getX() != temp2.getX() || temp1.getY() != temp2.getY() || bg.grid.changed){
       bg.weightMgr.generatePath();
@@ -136,6 +139,7 @@ class PlayingState extends BasicGameState {
     }
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
+		bg.mmgr.update(delta);
 
 		//bg.block.update(delta);
 

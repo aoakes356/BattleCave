@@ -28,7 +28,7 @@ public class Grid {
   public boolean changed;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
-    money = 10000;
+    money = 150;
     blockCount = 0;
     blocks = new ArrayList<>();
     mode = BUILD_MODE;
@@ -520,6 +520,11 @@ public class Grid {
   public void setChanged(boolean change){
     changed = change;
   }
+  public void forceBlock(int x, int y, Block b){
+    if(x < width && x > 0 && y < height && y > 0) {
+      blocks.get(x).set(y, b);
+    }
+  }
 
   public Block getNearestBlock(Vector pos){
     float dist;
@@ -527,7 +532,7 @@ public class Grid {
     Block nearest = null;
     for(ArrayList<Block> column: blocks){  // Naive approach for now.
       for(Block b: column) {
-        if (b.get_id() != GameObject.EMPTY_BLOCK_ID) {
+        if (b.get_id() != GameObject.EMPTY_BLOCK_ID && b.get_id() != GameObject.SPAWN_BLOCK_ID) {
           dist = b.getGridPos().subtract(pos).length();
           if (dist < min && ((nearest == null) || nearest.getY() < b.getY())) {
             min = dist;
