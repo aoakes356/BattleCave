@@ -284,6 +284,8 @@ public class Grid {
         nblock = new Block(x, y, 100);
       }else if(id == GameObject.EMPTY_BLOCK_ID){
         nblock = new EmptyBlock(coordMap(x,y,40));
+      }else if(id == GameObject.SPAWN_BLOCK_ID){
+        nblock = new Spawn(coordMap(x,y,40));
       }else{
         nblock = new Block(x, y, 100);
       }

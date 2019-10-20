@@ -85,9 +85,17 @@ public class MonsterManager {
       }
     }
     Spawn s1;
+    Block temp;
     for(Vector v:spawnPoints){
-      s1 = new Spawn(v);
-      grid.forceBlock(s1.gridX,s1.gridY,s1);
+      temp =grid.getAnyBlock(v);
+      if(temp == null || temp.get_id() != GameObject.SPAWN_BLOCK_ID) {
+        s1 = new Spawn(v);
+        grid.clickHandler(v,0,GameObject.BLOCK_ID);
+        grid.clickHandler(v,1,GameObject.SPAWN_BLOCK_ID);
+      }else{
+        s1 = (Spawn)grid.getAnyBlock(v);
+      }
+      s1.update(delta);
     }
   }
 
@@ -98,6 +106,13 @@ public class MonsterManager {
   public void render(Graphics g){
     for(Monster m: monsters){
       m.render(g);
+    }
+    Block temp;
+    for(Vector v:spawnPoints){
+      temp = grid.getAnyBlock(v);
+      if(temp != null){
+        temp.render(g);
+      }
     }
   }
 

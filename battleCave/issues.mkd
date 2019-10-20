@@ -29,13 +29,13 @@
 - **[24]** Implement a Monster class, make basic art.
 - **[25]** make target weights independent from monsters, make monsters follow path.
 - **[26]** Add a battle state.
-
-PHASE 1 Grid - (Low bar Complete)
-PHASE 2 Players and Monsters
 - **[27]** Get money from slaying the enemy.
 - **[28]** Take damage from the enemy when they are close enough.
 - **[29]** Add a way to transition between battle and building state(a button or something.).
 - **[30]** upon death, enter back into the building state with the newly acquired funds.
+
+PHASE 1 Grid - (Low bar Complete)
+PHASE 2 Players and Monsters
 - **[31]** Make spawn points impossible to occupy with other blocks.
 PHASE 3 Finish everything else
 - **[31]** Finish the block selection menu.
