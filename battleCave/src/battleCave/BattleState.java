@@ -73,6 +73,8 @@ public class BattleState extends BasicGameState {
   public void keyPressed(int key, char c){
 	  if(key == Input.KEY_I){
 	    itemPressed = !itemPressed;
+    }else if(key == Input.KEY_TAB){
+	    bounceGame.mmgr.setShowPathing(!bounceGame.mmgr.showPathing);
     }
     bounceGame.creature.keyHandler(key,true);
   }

@@ -15,7 +15,11 @@ public class GameObject extends Entity {
   public static final int PLAYER_ID = 5;
   public static final int MONSTER1_ID = 6;
   public static final int PROJECTILE_ID = 7;
-  public  Physics physics;
+  public static final int WINDOW_ID = 8;
+  public static final int HOTBLOCK_ID = 9;
+  public static final int HARDBLOCK_ID = 10;
+  public static final int HARDESTBLOCK_ID = 11;
+  public Physics physics;
 
   public GameObject(final float x, final float y){
     super(x,y);

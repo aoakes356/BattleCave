@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class Living extends GameObject{
   private int health;
+  private Block standing;
   private boolean noClimbing;
   private float maxSpeed;
   private float jump;
@@ -40,6 +41,7 @@ public class Living extends GameObject{
     currentImage = BounceGame.LIVING_THING_RSC;
     climbing = false;
     noClimbing = false;
+    standing = null;
 
   }
 
@@ -77,6 +79,9 @@ public class Living extends GameObject{
   public void update(int delta){
     if(noClimbing){
       climbing = false;
+    }
+    if(standing != null && standing.get_id() == GameObject.HOTBLOCK_ID){
+      damage(2);
     }
     previousGridPosition = gridPosition;
     gridPosition = Grid.mapCoord(getX(),getY(),40);
@@ -207,11 +212,13 @@ public class Living extends GameObject{
       if(obj.get_id() == GameObject.GROUND_ID){
         grounded = true;
         ground = true;
-      }else if(obj.get_id() == GameObject.BLOCK_ID){
+        standing = null;
+      }else if(Grid.isBlock(obj)&&obj.get_id()!=GameObject.SPAWN_BLOCK_ID){
         block = true;
         Block b = (Block)obj;
         if(b.gridX == (int)gridPosition.getX() && b.gridY >= (int)gridPosition.getY()) {
           grounded = true;
+          standing = b;
         }else if(((b.gridX > (int)gridPosition.getX() && goRight) ||(b.gridX < (int)gridPosition.getX() && goLeft)) && b.gridY >= (int)gridPosition.getY()){
           climbing = true;
         }

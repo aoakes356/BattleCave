@@ -7,6 +7,7 @@ import jig.Vector;
 import org.newdawn.slick.Graphics;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 public class ItemBar extends Entity {
   private boolean active;
@@ -20,6 +21,10 @@ public class ItemBar extends Entity {
     buttons = new ArrayList<>();
     buttonCount = 0;
     addItem(GameObject.BLOCK_ID,BounceGame.BASIC_BLOCK_RSC);
+    addItem(GameObject.WINDOW_ID,BounceGame.WINDOW_BLOCK_RSC);
+    addItem(GameObject.HOTBLOCK_ID,BounceGame.HOT_BLOCK_RSC);
+    addItem(GameObject.HARDBLOCK_ID,BounceGame.HARD_BLOCK_RSC);
+    addItem(GameObject.HARDESTBLOCK_ID, BounceGame.HARDEST_BLOCK_RSC);
     selected = GameObject.EMPTY_BLOCK_ID;
   }
 
@@ -46,6 +51,7 @@ public class ItemBar extends Entity {
       b.clickHandler(x,y,button);
       if(b.clicked){
         selected = b.id;
+        b.clicked = false;
       }
     }
 
@@ -65,7 +71,7 @@ public class ItemBar extends Entity {
     Shape s = getShapes().get(0);
     float relX = getX()-s.getMaxX();
     float relY = getY()-s.getMaxY();
-    return new Vector(gridX*40+relX+30,gridY*40+relY+30);
+    return new Vector(gridX*50+relX+30,gridY*50+relY+30);
   }
 
   public void addItem(int id, String image){

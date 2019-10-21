@@ -34,13 +34,14 @@
 - **[29]** Add a way to transition between battle and building state(a button or something.).
 - **[30]** upon death, enter back into the building state with the newly acquired funds.
 - **[31]** Make spawn points impossible to occupy with other blocks.
-
-PHASE 1 Grid - (Low bar Complete)
-PHASE 2 Players and Monsters
 - **[32]** Make enemies and players get squashed by falling blocks. damage is dependent on cluster size?.
-PHASE 3 Finish everything else
 - **[33]** Finish the block selection menu.
 - **[34]** Add new blocks, most important, add a window that you can shoot through. blocks are basically useless without that.
 - **[35]** Make pathing info toggleable.
-- **[36]** Add more kinds of enemies.
+
+PHASE 1 Grid - (Low bar Complete)
+PHASE 2 Players and Monsters
+PHASE 3 Finish everything else
+- **[36]** Save grid info so when they die, the original structure appears again in the playing state.
+- **[37]** Add more kinds of enemies.
 

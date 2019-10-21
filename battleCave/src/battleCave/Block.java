@@ -105,7 +105,7 @@ public class Block extends GameObject {
         super.physics.velocity.scale(0);
         super.physics.acceleration.scale(0);
         super.physics.force.scale(0);
-        if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
+        if(currentImage != BounceGame.BASIC_BLOCK_RSC && get_id() == GameObject.BLOCK_ID) {
           removeImage(ResourceManager.getImage(currentImage));
           addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
           currentImage = BounceGame.BASIC_BLOCK_RSC;
@@ -194,7 +194,7 @@ public class Block extends GameObject {
     int loops = 0;
     if(obj != this) {
       if (c != null) {
-        if (obj.get_id() == GameObject.GROUND_ID || obj.get_id() == GameObject.BLOCK_ID|| obj.get_id() == GameObject.SPAWN_BLOCK_ID) {
+        if (obj.get_id() == GameObject.GROUND_ID || Grid.isBlock(obj)) {
           if(obj.get_id() == GameObject.GROUND_ID){
             grounded = true;
             rooted = true;

@@ -17,6 +17,7 @@ public class MonsterManager {
   int elapsed;
   public int spawnRate; // Spawns per minute.
   public Living target;
+  public boolean showPathing;
   public MonsterManager(Grid g, WeightManager w, Ground ground){
     weights = w;
     grid = g;
@@ -34,6 +35,7 @@ public class MonsterManager {
     elapsed = 0;
     spawnRate = 10;
     target = null;
+    showPathing = false;
   }
 
   public void addMonsters(){
@@ -78,6 +80,7 @@ public class MonsterManager {
     }
     for(Iterator<Monster> it = monsters.iterator(); it.hasNext();){
       m = it.next();
+      m.setShowPathing(showPathing);
       m.update(delta);
       m.gridCollision(grid,ground);
       if(m.getHealth() < 0){
@@ -114,5 +117,8 @@ public class MonsterManager {
 
   public void setAutoSpawn(boolean a){
     autoSpawn = a;
+  }
+  public void setShowPathing(boolean s){
+    showPathing = s;
   }
 }

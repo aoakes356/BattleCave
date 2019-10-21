@@ -56,7 +56,7 @@ public class Grid {
 
   public static boolean isBlock(GameObject obj){
     int id = obj.get_id();
-    if(id == GameObject.SPAWN_BLOCK_ID || id == GameObject.BLOCK_ID){
+    if(id == GameObject.SPAWN_BLOCK_ID || id == GameObject.BLOCK_ID || id == GameObject.WINDOW_ID || id == GameObject.HOTBLOCK_ID || id == GameObject.HARDBLOCK_ID || id == GameObject.HARDESTBLOCK_ID){
       return true;
     }
     return false;
@@ -286,7 +286,7 @@ public class Grid {
   public void activateBlock(int x, int y, int id){
     Block temp;
     temp = this.blocks.get(x).get(y);
-    if((temp == null || temp.get_id() != id)&&isAvailable(x,y)){
+    if((temp == null || !isBlock(temp))&&isAvailable(x,y)){
       Block nblock;
       if(id == GameObject.BLOCK_ID) {
         nblock = new Block(x, y, 100);
@@ -294,7 +294,15 @@ public class Grid {
         nblock = new EmptyBlock(coordMap(x,y,40));
       }else if(id == GameObject.SPAWN_BLOCK_ID){
         nblock = new Spawn(coordMap(x,y,40),100,x,y);
-      }else{
+      }else if(id == GameObject.WINDOW_ID){
+        nblock = new WindowBlock(coordMap(x,y,40),100,x,y);
+      }else if(id == GameObject.HOTBLOCK_ID){
+        nblock = new HotBlock(coordMap(x,y,40),100,x,y);
+      }else if(id == GameObject.HARDBLOCK_ID){
+        nblock = new HardBlock(coordMap(x,y,40),100,x,y);
+      } else if (id == GameObject.HARDESTBLOCK_ID) {
+        nblock = new HardestBlock(coordMap(x,y,40),100,x,y);
+      } else {
         nblock = new Block(x, y, 100);
       }
       if(money - nblock.cost >= 0 && blockCount <= 500) {

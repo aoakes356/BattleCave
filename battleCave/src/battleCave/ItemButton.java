@@ -10,7 +10,10 @@ public class ItemButton extends CaveButton {
   }
 
   public void clickHandler(float x, float y, int button){
-    clicked = true;
+    if(super.contains(x,y)) {
+      clicked = true;
+      System.out.println("Clicked: " + id);
+    }
   }
 
   public void update(int delta){

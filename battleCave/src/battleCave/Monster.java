@@ -21,9 +21,11 @@ public class Monster extends Living {
   private WeightManager weightManager;
   public boolean drawPath;
   private HealthBar h;
+  private boolean showPathing;
   public Monster(float x, float y, Grid g, WeightManager w) {
     super(x, y, g);
     grid = g;
+    showPathing = false;
     setCurrentImage(BounceGame.BASIC_MONSTER_RSC);
     target = null;
     drawPath = false;
@@ -182,7 +184,7 @@ public class Monster extends Living {
   }
 
   public void path(Graphics g){
-    if(cachedPath == null){
+    if(cachedPath == null || !showPathing){
       return;
     }
     Block current = null, previous = null;
@@ -191,9 +193,7 @@ public class Monster extends Living {
       g.drawString(weightManager.getWeight(v)+"",Grid.coordMapX((int)v.getX(),40),Grid.coordMapY((int)v.getY(),40));
       previous = current;
       current = grid.getAnyBlock(v);
-      if(previous != null){
-        drawPath(g,previous,current,new ArrayList<>());
-      }
+      drawPath(g,previous,current,new ArrayList<>());
     }
   }
 
@@ -234,5 +234,8 @@ public class Monster extends Living {
 
   public void setPrice(int p){
     price = p;
+  }
+  public void setShowPathing(boolean s){
+    showPathing = s;
   }
 }

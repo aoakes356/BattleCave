@@ -83,7 +83,7 @@ public class Projectile extends GameObject{
   }
 
   public boolean collisionTest(GameObject g_obj) {
-    if (g_obj.get_id() == GameObject.EMPTY_BLOCK_ID || g_obj.get_id() == GameObject.SPAWN_BLOCK_ID){
+    if (g_obj.get_id() == GameObject.EMPTY_BLOCK_ID || g_obj.get_id() == GameObject.SPAWN_BLOCK_ID||g_obj.get_id()==GameObject.WINDOW_ID){
       return false;
     }
     Collision c = collides(g_obj);

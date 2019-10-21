@@ -67,6 +67,10 @@ public class BounceGame extends StateBasedGame {
   public static final String BASIC_MONSTER_RSC = "battleCave/resource/Monster.png";
   public static final String SPAWN_POINT_RSC = "battleCave/resource/SpawnPoint.png";
   public static final String BATTLE_BUTTON_RSC = "battleCave/resource/BattleButton.png";
+  public static final String WINDOW_BLOCK_RSC = "battleCave/resource/Window.png";
+  public static final String HOT_BLOCK_RSC = "battleCave/resource/HotBlock.png";
+  public static final String HARD_BLOCK_RSC = "battleCave/resource/HardBlock.png";
+  public static final String HARDEST_BLOCK_RSC = "battleCave/resource/HardestBlock.png";
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 
@@ -133,6 +137,11 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(BASIC_MONSTER_RSC);
 		ResourceManager.loadImage(SPAWN_POINT_RSC);
 		ResourceManager.loadImage(BATTLE_BUTTON_RSC);
+		ResourceManager.loadImage(WINDOW_BLOCK_RSC);
+		ResourceManager.loadImage(HOT_BLOCK_RSC);
+		ResourceManager.loadImage(HARD_BLOCK_RSC);
+		ResourceManager.loadImage(HARDEST_BLOCK_RSC);
+
     grid = new Grid(this,40);
     grid.setSelected(GameObject.EMPTY_BLOCK_ID);
 		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-16);
