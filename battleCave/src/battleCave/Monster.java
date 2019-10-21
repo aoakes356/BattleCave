@@ -22,6 +22,7 @@ public class Monster extends Living {
   public boolean drawPath;
   private HealthBar h;
   private boolean showPathing;
+  public boolean killed;
   public Monster(float x, float y, Grid g, WeightManager w) {
     super(x, y, g);
     grid = g;
@@ -32,11 +33,12 @@ public class Monster extends Living {
     cachedPath = new ArrayList<>();
     weightManager = w;
     price = 10;
+    killed =false;
     b =false;
     live = true;
     setSpeed(.5f);
     setNoClimbing(true);
-    h = new HealthBar(-maxHealth/2.0f,-35,this);
+    h = new HealthBar(-25,-35,this);
   }
 
   public void keyHandler(int key, boolean pressed){
@@ -69,13 +71,6 @@ public class Monster extends Living {
         it.remove();
       }
     }
-    for(Vector neighbor: neighbors){
-      if(neighbor.getX() >= 40 || neighbor.getY() >= 20){
-        System.out.println("!!NEIGHBORS!!");
-        System.out.println(neighbor);
-        System.out.println("----------------");
-      }
-    }
     return neighbors;
   }
 
@@ -84,7 +79,6 @@ public class Monster extends Living {
       Vector next = cachedPath.get(0);
       if(cachedPath.size() <= 1){
         if(live){
-          System.out.println("DAAAMAMAMMAMAMAAAGGGIIINNGG!!!");
           target.damage(1);
         }
       }
@@ -93,6 +87,9 @@ public class Monster extends Living {
         // Diagonal
         // Attack it stair case order.
         nextBlock.damage(1);
+        if(nextBlock.get_id() == GameObject.HOTBLOCK_ID){
+          damage(1);
+        }
         if(live) {
           if (nextBlock.below != null) {
             nextBlock.below.damage(1);
@@ -113,10 +110,12 @@ public class Monster extends Living {
       }
       if(next.getY() > getGridPos().getY()){
         up = false;
+        if(fly) {
+          down = true;
+        }
       }else if(next.getY() < getGridPos().getY()){
         if((int)next.getX() == (int)getGridPos().getX() && (target.isGrounded() || target.isClimbing())){
           // Change target to nearest block, this character can't go straight up.
-          System.out.println("!!!!!!!!!Changing targets!!!!!!!!!!!!");
           Block b = grid.getNearestBlock(getGridPos());
           secondary = b;
           if(b != null && b.getActive()) {
@@ -169,7 +168,6 @@ public class Monster extends Living {
             return;
           }
           cachedPath.add(next);
-          System.out.println("caching!!");
         }
       }
   }
@@ -188,7 +186,6 @@ public class Monster extends Living {
       return;
     }
     Block current = null, previous = null;
-    //System.out.println(cachedPath);
     for(Vector v: cachedPath){
       g.drawString(weightManager.getWeight(v)+"",Grid.coordMapX((int)v.getX(),40),Grid.coordMapY((int)v.getY(),40));
       previous = current;
@@ -237,5 +234,8 @@ public class Monster extends Living {
   }
   public void setShowPathing(boolean s){
     showPathing = s;
+  }
+  public void setKilled(){
+    killed = true;
   }
 }

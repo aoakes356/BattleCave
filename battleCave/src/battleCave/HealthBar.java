@@ -9,7 +9,7 @@ public class HealthBar extends GameObject{
   private Living reference;
   private float MaxHealth;
   public HealthBar(float x, float y, Living obj) {
-    super(x+obj.getX(), y+obj.getY());
+    super(obj.getX()+x, y+obj.getY());
     relativeX = x;
     relativeY = y;
     reference = obj;
@@ -25,9 +25,9 @@ public class HealthBar extends GameObject{
     super.render(g);
     Color save = g.getColor();
     g.setColor(Color.red);
-    g.drawLine(getX(),getY(),getX()+MaxHealth,getY());
+    g.drawLine(getX(),getY(),getX()+50,getY());
     g.setColor(Color.green);
-    g.drawLine(getX(),getY(),reference.getHealth()+getX(),getY());
+    g.drawLine(getX(),getY(),((float)reference.getHealth()/(float)reference.getMaxHealth())*50+getX(),getY());
     g.setColor(save);
   }
 }

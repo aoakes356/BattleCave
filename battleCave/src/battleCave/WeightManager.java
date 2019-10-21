@@ -32,11 +32,11 @@ public class WeightManager {
     float health = b.health;
     float weight = dist;
     if((int)blockPos.getX() != (int)startPos.getX() && (int)blockPos.getY() != (int)startPos.getY()){
-      weight += (diagonal*100);
+      weight += (diagonal*10)+health;
     }else if((int)blockPos.getY() > (int)startPos.getY() && (int)blockPos.getX() == (int)startPos.getX()){
-      weight += 110;// Straight up is bad.
+      weight += 10+health;// Straight up is bad.
     }else{
-      weight += 10;
+      weight += 10+health;
     }
 
     return weight;

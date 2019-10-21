@@ -12,7 +12,8 @@ public class HardestBlock extends Block{
     removeImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
     addImage(ResourceManager.getImage(BounceGame.HARDEST_BLOCK_RSC));
     cost = 40;
-    super.health = 400;
+    super.health = 4000;
+    heal();
   }
 
   @Override

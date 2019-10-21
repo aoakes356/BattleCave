@@ -297,11 +297,15 @@ public class Block extends GameObject {
     return isStatic;
   }
 
+  public void setRooted(boolean r){
+    rooted = r;
+  }
+
   public void damage(int damage){
-    health -= damage;
+    currentHealth -= damage;
     if(get_id() != GameObject.EMPTY_BLOCK_ID){
-      if(health < 0){
-        health = 0;
+      if(currentHealth < 0){
+        currentHealth = 0;
         active = false;
       }
     }

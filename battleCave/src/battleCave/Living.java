@@ -19,6 +19,7 @@ public class Living extends GameObject{
   public boolean goRight;
   private boolean crouch;
   public boolean up;
+  public boolean down;
   private boolean grounded;
   private Vector gridPosition;
   private Vector previousGridPosition;
@@ -26,6 +27,7 @@ public class Living extends GameObject{
   private boolean climbing;
   public Grid grid;
   public int maxHealth;
+  public boolean fly;
   public Living(float x, float y, Grid g) {
     super(x, y);
     left =  false;
@@ -42,7 +44,7 @@ public class Living extends GameObject{
     climbing = false;
     noClimbing = false;
     standing = null;
-
+    fly = false;
   }
 
   public void keyHandler(int key, boolean pressed){
@@ -80,7 +82,7 @@ public class Living extends GameObject{
     if(noClimbing){
       climbing = false;
     }
-    if(standing != null && standing.get_id() == GameObject.HOTBLOCK_ID){
+    if(standing != null && standing.get_id() == GameObject.HOTBLOCK_ID && grid.mode == Grid.BATTLE_MODE){
       damage(2);
     }
     previousGridPosition = gridPosition;
@@ -98,17 +100,21 @@ public class Living extends GameObject{
       physics.addForce(-.005f*maxSpeed, 0);
     }else if(goRight){
       physics.addForce(.005f*maxSpeed, 0);
-    }if(up){
-      if(grounded || climbing) {
+    }if(up) {
+      if(fly){
+        physics.addForce(0,-.005f*maxSpeed);
+      }else if(grounded || climbing) {
         physics.setVelocity(new PhysVector( physics.velocity.x,-1.3f*jump));
         grounded = false;
       }
       up = false;
+    }else if(down){
+      physics.addForce(0,.005f*maxSpeed);
     }
     super.physics.addForce(super.physics.velocity.cloneVec().scale((-.01f)));
-    if(!grounded && !climbing) {
+    if(!grounded && !climbing && !fly) {
       super.physics.addAcceleration(0, (.000981f) * 6);
-    }else if(!climbing){
+    }else if(!climbing&& !fly){
       this.setPosition(getX(),Grid.coordMapY((int)gridPosition.getY(),40));
     }
     if(previousGridPosition.getX() != gridPosition.getX() || previousGridPosition.getY() != gridPosition.getY() || grid.changed){
@@ -195,7 +201,7 @@ public class Living extends GameObject{
         }
       }
       if(count >= 2 && grid.getAnyBlock(gridPosition).get_id() == GameObject.BLOCK_ID &&grid.mode==Grid.BATTLE_MODE){
-        setHealth(getHealth()-10*count);
+        setHealth(getHealth()-100*count);
       }
       return true;
     }
@@ -311,5 +317,9 @@ public class Living extends GameObject{
 
   public void damage(int d){
     setHealth(getHealth()-d);
+  }
+
+  public void setFly(boolean f){
+    fly = f;
   }
 }

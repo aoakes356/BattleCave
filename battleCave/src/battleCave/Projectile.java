@@ -108,6 +108,14 @@ public class Projectile extends GameObject{
     }
   }
 
+  public void setDamage(int damage){
+    this.damage = damage;
+  }
+
+  public int getDamage(){
+    return damage;
+  }
+
   public int get_id(){
     return GameObject.PROJECTILE_ID;
   }

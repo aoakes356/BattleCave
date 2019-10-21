@@ -47,6 +47,7 @@ class PlayingState extends BasicGameState {
     bounceGame.mmgr.killAll();
     bounceGame.creature.setHealth(bounceGame.creature.getMaxHealth());
 
+
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
@@ -59,6 +60,8 @@ class PlayingState extends BasicGameState {
 		bg.creature.render(g);
 		bg.mmgr.render(g);
 		bg.battlebtn.render(g);
+		bg.hb.render(g);
+		bg.db.render(g);
 		g.drawString("Money: " + bg.grid.money, 10, 30);
 	}
 
@@ -69,13 +72,11 @@ class PlayingState extends BasicGameState {
 	  clickedX = x;
 	  clickedY = y;
 	  clickedButton = button;
-	  System.out.println("Mouse clicked: "+button);
   }
 
   @Override
   public void mousePressed(int button, int x, int y){
 	  super.mousePressed(button,x,y);
-	  System.out.println("Mouse pressed: "+button);
 	  pressed = true;
 	  this.button = button;
 
@@ -106,6 +107,7 @@ class PlayingState extends BasicGameState {
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
 		bg.battlebtn.update(delta);
+		bg.db.update(delta);
 		//bg.block.collision(bg.ground);
     if(pressed && !bg.items.isActive()){
       bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button, bg.grid.getSelected());
@@ -119,6 +121,8 @@ class PlayingState extends BasicGameState {
     }
     if(clicked){
       bg.battlebtn.clickHandler(clickedX,clickedY,button,bg);
+      bg.hb.clickHandler(clickedX,clickedY,button,bg);
+      bg.db.clickHandler(clickedX,clickedY,button,bg);
      //bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
     }
     if(bg.items.isActive() && clicked){
@@ -148,7 +152,7 @@ class PlayingState extends BasicGameState {
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
 		bg.mmgr.update(delta);
-
+    bg.hb.update(delta);
 		//bg.block.update(delta);
 
 

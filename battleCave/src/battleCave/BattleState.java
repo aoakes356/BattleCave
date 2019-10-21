@@ -1,5 +1,6 @@
 package battleCave;
 
+import jig.ResourceManager;
 import jig.Vector;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -7,6 +8,8 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+
+import java.util.ArrayList;
 
 public class BattleState extends BasicGameState {
   int bounces;
@@ -17,6 +20,8 @@ public class BattleState extends BasicGameState {
 	private boolean itemPressed;
 	private boolean clicked;
 	private int clickedX, clickedY, clickedButton;
+	private int moneySave;
+	private ArrayList<ArrayList<Block>> blockSave;
   @Override
   public int getID() {
     return BounceGame.BATTLESTATE;
@@ -25,12 +30,21 @@ public class BattleState extends BasicGameState {
   public void enter(GameContainer container, StateBasedGame game) throws SlickException {
     bounces = 0;
     container.setSoundOn(true);
+    ResourceManager.getMusic(BounceGame.MUSIC_RSC).play();
     g = ((BounceGame)game).grid;
     itemPressed = false;
     clicked = false;
     g.setMode(Grid.BATTLE_MODE);
     bounceGame = (BounceGame)game;
     bounceGame.mmgr.setAutoSpawn(true);
+    blockSave = new ArrayList<>();
+    g.brokenValue = 0;
+    for(int i = 0; i < g.blocks.size(); i++){
+      blockSave.add(new ArrayList<>());
+      for(Block b:g.blocks.get(i)){
+        blockSave.get(i).add(Grid.cloneBlock(b));
+      }
+    }
   }
 
   @Override
@@ -46,6 +60,7 @@ public class BattleState extends BasicGameState {
     bg.items.render(g);
     bg.creature.render(g);
     bg.mmgr.render(g);
+    g.drawString("Kills: " + bg.creature.getKills(), 10, 30);
   }
 @Override
   public void mouseClicked(int button, int x, int y, int count){
@@ -53,13 +68,11 @@ public class BattleState extends BasicGameState {
 	  clickedX = x;
 	  clickedY = y;
 	  clickedButton = button;
-	  System.out.println("Mouse clicked: "+button);
   }
 
   @Override
   public void mousePressed(int button, int x, int y){
 	  super.mousePressed(button,x,y);
-	  System.out.println("Mouse pressed: "+button);
 	  pressed = true;
 	  this.button = button;
 
@@ -85,10 +98,16 @@ public class BattleState extends BasicGameState {
   @Override
   public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
     Input input = container.getInput();
+    if(!ResourceManager.getMusic(BounceGame.MUSIC_RSC).playing()){
+      ResourceManager.getMusic(BounceGame.MUSIC_RSC).play();
+    }
     BounceGame bg = (BounceGame)game;
     if(clicked){
       bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
       clicked = false;
+    }
+    if(pressed){
+      bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
     }
     Vector temp1 = bg.creature.getGridPos();
     Vector temp2;
@@ -110,6 +129,7 @@ public class BattleState extends BasicGameState {
 		bg.items.update(delta);
 		bg.mmgr.update(delta);
 		if(bg.creature.getHealth() <= 0){
+      g.loadSave(blockSave);
 		  bg.enterState(BounceGame.PLAYINGSTATE);
     }
 
