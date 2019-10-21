@@ -72,13 +72,11 @@ class PlayingState extends BasicGameState {
 	  clickedX = x;
 	  clickedY = y;
 	  clickedButton = button;
-	  System.out.println("Mouse clicked: "+button);
   }
 
   @Override
   public void mousePressed(int button, int x, int y){
 	  super.mousePressed(button,x,y);
-	  System.out.println("Mouse pressed: "+button);
 	  pressed = true;
 	  this.button = button;
 

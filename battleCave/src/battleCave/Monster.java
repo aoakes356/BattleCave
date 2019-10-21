@@ -71,13 +71,6 @@ public class Monster extends Living {
         it.remove();
       }
     }
-    for(Vector neighbor: neighbors){
-      if(neighbor.getX() >= 40 || neighbor.getY() >= 20){
-        System.out.println("!!NEIGHBORS!!");
-        System.out.println(neighbor);
-        System.out.println("----------------");
-      }
-    }
     return neighbors;
   }
 
@@ -86,7 +79,6 @@ public class Monster extends Living {
       Vector next = cachedPath.get(0);
       if(cachedPath.size() <= 1){
         if(live){
-          System.out.println("DAAAMAMAMMAMAMAAAGGGIIINNGG!!!");
           target.damage(1);
         }
       }
@@ -124,7 +116,6 @@ public class Monster extends Living {
       }else if(next.getY() < getGridPos().getY()){
         if((int)next.getX() == (int)getGridPos().getX() && (target.isGrounded() || target.isClimbing())){
           // Change target to nearest block, this character can't go straight up.
-          System.out.println("!!!!!!!!!Changing targets!!!!!!!!!!!!");
           Block b = grid.getNearestBlock(getGridPos());
           secondary = b;
           if(b != null && b.getActive()) {
@@ -177,7 +168,6 @@ public class Monster extends Living {
             return;
           }
           cachedPath.add(next);
-          System.out.println("caching!!");
         }
       }
   }
@@ -196,7 +186,6 @@ public class Monster extends Living {
       return;
     }
     Block current = null, previous = null;
-    //System.out.println(cachedPath);
     for(Vector v: cachedPath){
       g.drawString(weightManager.getWeight(v)+"",Grid.coordMapX((int)v.getX(),40),Grid.coordMapY((int)v.getY(),40));
       previous = current;

@@ -60,6 +60,7 @@ public class BattleState extends BasicGameState {
     bg.items.render(g);
     bg.creature.render(g);
     bg.mmgr.render(g);
+    g.drawString("Kills: " + bg.creature.getKills(), 10, 30);
   }
 @Override
   public void mouseClicked(int button, int x, int y, int count){
@@ -67,13 +68,11 @@ public class BattleState extends BasicGameState {
 	  clickedX = x;
 	  clickedY = y;
 	  clickedButton = button;
-	  System.out.println("Mouse clicked: "+button);
   }
 
   @Override
   public void mousePressed(int button, int x, int y){
 	  super.mousePressed(button,x,y);
-	  System.out.println("Mouse pressed: "+button);
 	  pressed = true;
 	  this.button = button;
 

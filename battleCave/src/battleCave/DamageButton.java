@@ -1,5 +1,6 @@
 package battleCave;
 
+
 public class DamageButton extends CaveButton {
   public DamageButton(float x, float y) {
     super(x, y);
@@ -8,7 +9,7 @@ public class DamageButton extends CaveButton {
 
   @Override
   public void clickHandler(float x, float y, int button, BounceGame bg ){
-    if(bg.grid.money >= 100 && button == 0) {
+    if(bg.grid.money >= 100 && button == 0 && contains(x,y)) {
       bg.creature.setDamage(bg.creature.getDamage() + 10);
       bg.grid.setMoney(bg.grid.money-100);
     }

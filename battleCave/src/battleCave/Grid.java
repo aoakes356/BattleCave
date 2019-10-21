@@ -234,7 +234,6 @@ public class Grid {
         return;
       }
       ArrayList<Cluster> clusters;
-      System.out.println("Button: " +button);
       if(id == GameObject.EMPTY_BLOCK_ID){return;}
       if (button == 1) {
         activateBlock((int) e.getX(), (int) e.getY(), id);
@@ -290,19 +289,19 @@ public class Grid {
     Block nblock;
     if(isBlock(b)){
       if(b.get_id() == GameObject.BLOCK_ID) {
-        nblock = new Block(b.gridX, b.gridY, 100);
+        nblock = new Block(b.gridX, b.gridY, 1000);
       }else if(b.get_id() == GameObject.EMPTY_BLOCK_ID){
         nblock = new EmptyBlock(coordMap(b.gridX,b.gridY,40));
       }else if(b.get_id() == GameObject.SPAWN_BLOCK_ID){
-        nblock = new Spawn(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+        nblock = new Spawn(coordMap(b.gridX,b.gridY,40),1000,b.gridX,b.gridY);
       }else if(b.get_id() == GameObject.WINDOW_ID){
-        nblock = new WindowBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+        nblock = new WindowBlock(coordMap(b.gridX,b.gridY,40),1000,b.gridX,b.gridY);
       }else if(b.get_id() == GameObject.HOTBLOCK_ID){
-        nblock = new HotBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+        nblock = new HotBlock(coordMap(b.gridX,b.gridY,40),1000,b.gridX,b.gridY);
       }else if(b.get_id() == GameObject.HARDBLOCK_ID){
-        nblock = new HardBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+        nblock = new HardBlock(coordMap(b.gridX,b.gridY,40),2000,b.gridX,b.gridY);
       } else if (b.get_id() == GameObject.HARDESTBLOCK_ID) {
-        nblock = new HardestBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+        nblock = new HardestBlock(coordMap(b.gridX,b.gridY,40),4000,b.gridX,b.gridY);
       } else {
         nblock = new Block(b.gridX, b.gridY, 100);
       }
@@ -461,21 +460,7 @@ public class Grid {
       }if(start.right != null) {
         start.right.left = null;
       }
-      if(start.above == null && start.below == null && start.left == null && start.right == null){
-        System.out.println("All neighbors are nulll!!!!!");
-      }
-      if(start.above != null &&start.above.get_id() == GameObject.EMPTY_BLOCK_ID){
-        System.out.println("ABOVE are EMPTY BLOCKS!");
-      }
-      if(start.below != null && start.below.get_id() == GameObject.EMPTY_BLOCK_ID){
-        System.out.println("BELOW are EMPTY BLOCKS!");
-      }
-      if(start.left != null && start.left.get_id() == GameObject.EMPTY_BLOCK_ID ){
-        System.out.println("LEFT are EMPTY BLOCKS!");
-      }
-      if(start.right != null &&start.right.get_id() == GameObject.EMPTY_BLOCK_ID ){
-        System.out.println("RIGHT are EMPTY BLOCKS!");
-      }
+
       boolean u = isRooted(start.above, visitedUp);
       boolean d = isRooted(start.below, visitedDown);
       boolean l = isRooted(start.left, visitedLeft);

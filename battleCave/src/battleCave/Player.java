@@ -33,7 +33,7 @@ public class Player extends Living {
 
   public void attack(Vector dir){
     Projectile p = new Projectile(getX(),getY(),dir,1);
-    p.setDamage(p.getDamage()+kills+damage);
+    p.setDamage(p.getDamage()+damage);
     projectiles.add(p);
   }
 
@@ -96,4 +96,6 @@ public class Player extends Living {
   public int getDamage(){
     return damage;
   }
+
+  public int getKills(){return kills;}
 }
