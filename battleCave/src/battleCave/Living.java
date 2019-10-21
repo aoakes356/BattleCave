@@ -110,6 +110,9 @@ public class Living extends GameObject{
       grounded = false;
       climbing = false;
     }
+    if(!goLeft && !goRight){
+      climbing = false;
+    }
     super.update(delta);
 
 
@@ -169,7 +172,26 @@ public class Living extends GameObject{
     boolean c7 =collisionTest(g.blocks.get(gx).get(yMax));
     boolean c8 =collisionTest(g.blocks.get(gx).get(gy));
     boolean c9 = collisionTest(ground);
+    ArrayList<Boolean> tests = new ArrayList<>();
+    tests.add(c1);
+    tests.add(c2);
+    tests.add(c3);
+    tests.add(c4);
+    tests.add(c5);
+    tests.add(c6);
+    tests.add(c7);
+    tests.add(c8);
+    tests.add(c9);
     if(c1||c2||c3||c4||c5||c6||c7||c8||c9){
+      int count = 0;
+      for(Boolean test: tests){
+        if(test){
+          count++;
+        }
+      }
+      if(count >= 2 && grid.getAnyBlock(gridPosition).get_id() == GameObject.BLOCK_ID &&grid.mode==Grid.BATTLE_MODE){
+        setHealth(getHealth()-10*count);
+      }
       return true;
     }
     return false;
@@ -188,16 +210,15 @@ public class Living extends GameObject{
       }else if(obj.get_id() == GameObject.BLOCK_ID){
         block = true;
         Block b = (Block)obj;
-        if(b.gridX == (int)gridPosition.getX()) {
+        if(b.gridX == (int)gridPosition.getX() && b.gridY >= (int)gridPosition.getY()) {
           grounded = true;
-        }else if((b.gridX > (int)gridPosition.getX() && goRight) ||(b.gridX < (int)gridPosition.getX() && goLeft)){
+        }else if(((b.gridX > (int)gridPosition.getX() && goRight) ||(b.gridX < (int)gridPosition.getX() && goLeft)) && b.gridY >= (int)gridPosition.getY()){
           climbing = true;
         }
       }
       if(block || ground) {
         int loops = 0;
         while (c != null) {
-          System.out.println("Stuck in the living collision loop.");
           loops++;
           if (ground || block) {
             translate(c.getMinPenetration().scale(.1f));

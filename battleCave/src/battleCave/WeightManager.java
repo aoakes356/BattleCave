@@ -67,13 +67,6 @@ public class WeightManager {
         it.remove();
       }
     }
-    for(Vector neighbor: neighbors){
-      if(neighbor.getX() >= 40 || neighbor.getY() >= 20){
-        System.out.println("!!NEIGHBORS!!");
-        System.out.println(neighbor);
-        System.out.println("----------------");
-      }
-    }
     return neighbors;
   }
 
@@ -139,11 +132,8 @@ public class WeightManager {
           if(!visited.contains(neighbor)){
             p.add(neighbor);
             visited.add(neighbor);
-          }else{
-            System.out.println("redundant");
           }
         }
-        System.out.println("Next Node!");
       }
     }
   }

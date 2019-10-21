@@ -25,12 +25,12 @@ public class MonsterManager {
     spawnPoints = new ArrayList<>();
     autoSpawn = false;
     spawnPoints = new ArrayList<>();
-    Spawn s1 = new Spawn(new Vector(Grid.coordMapX(1,40),Grid.coordMapY(grid.height-2,40)));
-    Spawn s2 = new Spawn(new Vector(Grid.coordMapX(grid.width-2,40),Grid.coordMapY(grid.height-2,40)));
+    Spawn s1 = new Spawn(Grid.coordMap(grid.width-1,grid.height-2,40),100,grid.width-1,grid.height-2);
+    Spawn s2 = new Spawn(Grid.coordMap(0,grid.height-2,40),100,0,grid.height-2);
     spawnPoints.add(s1.getPosition());
     spawnPoints.add(s2.getPosition());
-    grid.forceBlock(s1.gridX,s1.gridY,s1);
-    grid.forceBlock(s2.gridX,s2.gridY,s2);
+    grid.clickHandler(s1.getPosition(),1,GameObject.SPAWN_BLOCK_ID);
+    grid.clickHandler(s2.getPosition(),1,GameObject.SPAWN_BLOCK_ID);
     elapsed = 0;
     spawnRate = 10;
     target = null;
@@ -72,6 +72,7 @@ public class MonsterManager {
       elapsed += delta;
       if (elapsed >= 60000 / spawnRate) {
         addMonsters();
+        spawnRate++;
         elapsed = 0;
       }
     }
@@ -84,18 +85,13 @@ public class MonsterManager {
         it.remove();
       }
     }
-    Spawn s1;
     Block temp;
     for(Vector v:spawnPoints){
-      temp =grid.getAnyBlock(v);
+      temp =grid.getAnyBlock(Grid.mapCoord(v.getX(),v.getY(),40));
       if(temp == null || temp.get_id() != GameObject.SPAWN_BLOCK_ID) {
-        s1 = new Spawn(v);
-        grid.clickHandler(v,0,GameObject.BLOCK_ID);
+        grid.clickHandler(v,0,2);
         grid.clickHandler(v,1,GameObject.SPAWN_BLOCK_ID);
-      }else{
-        s1 = (Spawn)grid.getAnyBlock(v);
       }
-      s1.update(delta);
     }
   }
 
@@ -106,13 +102,6 @@ public class MonsterManager {
   public void render(Graphics g){
     for(Monster m: monsters){
       m.render(g);
-    }
-    Block temp;
-    for(Vector v:spawnPoints){
-      temp = grid.getAnyBlock(v);
-      if(temp != null){
-        temp.render(g);
-      }
     }
   }
 

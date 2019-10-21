@@ -89,7 +89,7 @@ public class Block extends GameObject {
       this.gridY = (int) pos.getY();
       if (grounded) {
         // Keep in its grid position.
-        if(currentImage != BounceGame.STATIC_BLOCK_RSC) {
+        if(currentImage != BounceGame.STATIC_BLOCK_RSC && get_id() == GameObject.BLOCK_ID) {
           removeImage(ResourceManager.getImage(currentImage));
           addImage(ResourceManager.getImage(BounceGame.STATIC_BLOCK_RSC));
           currentImage = BounceGame.STATIC_BLOCK_RSC;
@@ -111,7 +111,7 @@ public class Block extends GameObject {
           currentImage = BounceGame.BASIC_BLOCK_RSC;
         }
       }else {
-        if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
+        if(currentImage != BounceGame.BASIC_BLOCK_RSC && get_id() == GameObject.BLOCK_ID) {
           removeImage(ResourceManager.getImage(currentImage));
           addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
           currentImage = BounceGame.BASIC_BLOCK_RSC;
@@ -194,7 +194,7 @@ public class Block extends GameObject {
     int loops = 0;
     if(obj != this) {
       if (c != null) {
-        if (obj.get_id() == GameObject.GROUND_ID || obj.get_id() == GameObject.BLOCK_ID) {
+        if (obj.get_id() == GameObject.GROUND_ID || obj.get_id() == GameObject.BLOCK_ID|| obj.get_id() == GameObject.SPAWN_BLOCK_ID) {
           if(obj.get_id() == GameObject.GROUND_ID){
             grounded = true;
             rooted = true;
@@ -209,8 +209,7 @@ public class Block extends GameObject {
         Block temp3;
         while (c != null) {
           loops ++;
-          System.out.println("Stuck in Block collision loop");
-          if(obj.get_id() == GameObject.BLOCK_ID){
+          if(obj.get_id() == GameObject.BLOCK_ID || obj.get_id() == GameObject.SPAWN_BLOCK_ID){
             temp3 = (Block)obj;
             if(temp3.grounded && !grounded){
               translate(c.getMinPenetration().scale(.5f));
@@ -220,17 +219,13 @@ public class Block extends GameObject {
               c = collides(obj);
             }else{
               if(!isStatic && temp3.isStatic){
-                System.out.println("not static, and is static.");
                 translate(c.getMinPenetration().scale(.01f));
                 c = collides(obj);
               }else if(grounded && temp3.grounded){
-                System.out.println("Both are grounded?");
                 translate(c.getMinPenetration().scale(.01f));
                 c = collides(obj);
               }else if(!grounded && !temp3.grounded){
-                System.out.println("Both are !!NOT!! grounded?");
                 translate(c.getMinPenetration().scale(.01f));
-                System.out.println("minpen: "+c.getMinPenetration().getX()+", "+c.getMinPenetration().getY());
                 c = collides(obj);
               }else{
                 c = null;

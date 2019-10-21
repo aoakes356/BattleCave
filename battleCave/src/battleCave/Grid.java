@@ -1,6 +1,7 @@
 package battleCave;
 
 import jig.Vector;
+import org.lwjgl.Sys;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -93,7 +94,7 @@ public class Grid {
   }
 
   public void collision(GameObject obj){
-    if(obj.get_id() == GameObject.BLOCK_ID){
+    if(obj.get_id() == GameObject.BLOCK_ID || obj.get_id() == GameObject.SPAWN_BLOCK_ID){
       Block temp = (Block)obj;
       if(!temp.getActive()){
         return;
@@ -176,7 +177,6 @@ public class Grid {
     }
     if(chunks.size() > 0){
       changed = true;
-      System.out.println("falling chunks.");
     }
   }
 
@@ -285,7 +285,7 @@ public class Grid {
       }else if(id == GameObject.EMPTY_BLOCK_ID){
         nblock = new EmptyBlock(coordMap(x,y,40));
       }else if(id == GameObject.SPAWN_BLOCK_ID){
-        nblock = new Spawn(coordMap(x,y,40));
+        nblock = new Spawn(coordMap(x,y,40),100,x,y);
       }else{
         nblock = new Block(x, y, 100);
       }

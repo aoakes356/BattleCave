@@ -7,15 +7,22 @@ import org.newdawn.slick.Graphics;
 
 public class Spawn extends Block {
 
-  public Spawn(Vector pos) {
-    super(pos.getX(),pos.getY());
+  public Spawn(Vector pos, float health, int gx, int gy) {
+    this(pos.getX(),pos.getY(),health,gx,gy);
+  }
+  public Spawn(float x, float y, float health, int gx, int gy) {
+    super(x,y,health,gx,gy);
+    gridX = Grid.mapCoordX(x,40);
+    gridY = Grid.mapCoordY(y,40);
     removeImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
     addImage(ResourceManager.getImage(BounceGame.SPAWN_POINT_RSC));
-    setGrounded();
-    setActive(true);
     cost = 0;
+    setActive(true);
   }
 
+public void collision(GameObject obj){
+    super.collision(obj);
+}
 
   public void update(int delta){
     super.update(delta);
