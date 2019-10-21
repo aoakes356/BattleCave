@@ -27,6 +27,7 @@ public class Grid {
   private ArrayList<Cluster> chunks;
   private int blockCount;
   public boolean changed;
+  public int brokenValue;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
     money = 150;
@@ -52,6 +53,7 @@ public class Grid {
       }
 
     }
+    brokenValue = 0;
   }
 
   public static boolean isBlock(GameObject obj){
@@ -399,7 +401,9 @@ public class Grid {
     ArrayList<Cluster> clusters = null;
     if(start != null && start.get_id() != GameObject.EMPTY_BLOCK_ID){
       money += start.cost;
+      brokenValue += start.cost;
       blockCount--;
+
       changed = true;
       ArrayList<Block> visitedUp = new ArrayList<>();
       ArrayList<Block> visitedDown = new ArrayList<>();
@@ -501,6 +505,9 @@ public class Grid {
 
   public void setMode(int m){
     mode = m;
+    if(mode == Grid.BATTLE_MODE){
+      brokenValue = 0;
+    }
   }
 
   public Block getAnyBlock(Vector v){
@@ -560,6 +567,23 @@ public class Grid {
       }
     }
     return nearest;
+  }
+
+
+  public void loadSave(ArrayList<ArrayList<Block>> save){
+    blocks.clear();
+    int value = 0;
+    Block current;
+    for(int i = 0; i < save.size();i++){
+      blocks.add(new ArrayList<>());
+      for(int j = 0; j < save.get(i).size(); j++){
+        current = save.get(i).get(j);
+        blocks.get(i).add(current);
+        current.setGrid(i,j);
+        current.setPosition(coordMap(i,j,40));
+      }
+    }
+    money -= brokenValue;
   }
 
 

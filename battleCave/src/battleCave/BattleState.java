@@ -8,6 +8,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import java.util.ArrayList;
+
 public class BattleState extends BasicGameState {
   int bounces;
 	public Grid g;
@@ -17,6 +19,8 @@ public class BattleState extends BasicGameState {
 	private boolean itemPressed;
 	private boolean clicked;
 	private int clickedX, clickedY, clickedButton;
+	private int moneySave;
+	private ArrayList<ArrayList<Block>> blockSave;
   @Override
   public int getID() {
     return BounceGame.BATTLESTATE;
@@ -31,6 +35,14 @@ public class BattleState extends BasicGameState {
     g.setMode(Grid.BATTLE_MODE);
     bounceGame = (BounceGame)game;
     bounceGame.mmgr.setAutoSpawn(true);
+    blockSave = new ArrayList<>();
+    g.brokenValue = 0;
+    for(int i = 0; i < g.blocks.size(); i++){
+      blockSave.add(new ArrayList<>());
+      for(Block b:g.blocks.get(i)){
+        blockSave.get(i).add(b);
+      }
+    }
   }
 
   @Override
@@ -111,6 +123,13 @@ public class BattleState extends BasicGameState {
 		bg.mmgr.update(delta);
 		if(bg.creature.getHealth() <= 0){
 		  bg.enterState(BounceGame.PLAYINGSTATE);
+		  for(ArrayList<Block> bks: blockSave){
+		    for(Block b: bks){
+		      b.heal();
+		      b.setActive(true);
+        }
+      }
+      g.loadSave(blockSave);
     }
 
   }

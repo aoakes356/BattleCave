@@ -13,6 +13,7 @@ public class HardBlock extends Block {
     addImage(ResourceManager.getImage(BounceGame.HARD_BLOCK_RSC));
     cost = 20;
     super.health = 200;
+    heal();
   }
 
   @Override
