@@ -235,6 +235,7 @@ public class Grid {
       }
       ArrayList<Cluster> clusters;
       System.out.println("Button: " +button);
+      if(id == GameObject.EMPTY_BLOCK_ID){return;}
       if (button == 1) {
         activateBlock((int) e.getX(), (int) e.getY(), id);
       } else if (button == 0) {
@@ -285,27 +286,69 @@ public class Grid {
     return new Vector(gx,gy);
   }
 
+  public static Block cloneBlock(Block b){
+    Block nblock;
+    if(isBlock(b)){
+      if(b.get_id() == GameObject.BLOCK_ID) {
+        nblock = new Block(b.gridX, b.gridY, 100);
+      }else if(b.get_id() == GameObject.EMPTY_BLOCK_ID){
+        nblock = new EmptyBlock(coordMap(b.gridX,b.gridY,40));
+      }else if(b.get_id() == GameObject.SPAWN_BLOCK_ID){
+        nblock = new Spawn(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+      }else if(b.get_id() == GameObject.WINDOW_ID){
+        nblock = new WindowBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+      }else if(b.get_id() == GameObject.HOTBLOCK_ID){
+        nblock = new HotBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+      }else if(b.get_id() == GameObject.HARDBLOCK_ID){
+        nblock = new HardBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+      } else if (b.get_id() == GameObject.HARDESTBLOCK_ID) {
+        nblock = new HardestBlock(coordMap(b.gridX,b.gridY,40),100,b.gridX,b.gridY);
+      } else {
+        nblock = new Block(b.gridX, b.gridY, 100);
+      }
+    }else{
+      nblock = new EmptyBlock(coordMap(b.gridX,b.gridY,40));
+    }
+    nblock.right = b.right;
+    nblock.left = b.left;
+    nblock.above = b.above;
+    nblock.below = b.below;
+    if(b.grounded){
+      nblock.setGrounded();
+    }else{
+      nblock.setChanging();
+    }if(b.rooted){
+      nblock.setRooted(true);
+    }else{
+      nblock.setRooted(false);
+    }if(b.isStatic()){
+      nblock.setStatic();
+    }
+    nblock.setActive(true);
+    return nblock;
+  }
+
   public void activateBlock(int x, int y, int id){
     Block temp;
     temp = this.blocks.get(x).get(y);
     if((temp == null || !isBlock(temp))&&isAvailable(x,y)){
       Block nblock;
       if(id == GameObject.BLOCK_ID) {
-        nblock = new Block(x, y, 100);
+        nblock = new Block(x, y, 1000);
       }else if(id == GameObject.EMPTY_BLOCK_ID){
         nblock = new EmptyBlock(coordMap(x,y,40));
       }else if(id == GameObject.SPAWN_BLOCK_ID){
         nblock = new Spawn(coordMap(x,y,40),100,x,y);
       }else if(id == GameObject.WINDOW_ID){
-        nblock = new WindowBlock(coordMap(x,y,40),100,x,y);
+        nblock = new WindowBlock(coordMap(x,y,40),1000,x,y);
       }else if(id == GameObject.HOTBLOCK_ID){
-        nblock = new HotBlock(coordMap(x,y,40),100,x,y);
+        nblock = new HotBlock(coordMap(x,y,40),1000,x,y);
       }else if(id == GameObject.HARDBLOCK_ID){
-        nblock = new HardBlock(coordMap(x,y,40),100,x,y);
+        nblock = new HardBlock(coordMap(x,y,40),20000,x,y);
       } else if (id == GameObject.HARDESTBLOCK_ID) {
-        nblock = new HardestBlock(coordMap(x,y,40),100,x,y);
+        nblock = new HardestBlock(coordMap(x,y,40),40000,x,y);
       } else {
-        nblock = new Block(x, y, 100);
+        nblock = new Block(x, y, 1000);
       }
       if(money - nblock.cost >= 0 && blockCount <= 500) {
         this.blocks.get(x).set(y, nblock);
@@ -418,6 +461,21 @@ public class Grid {
       }if(start.right != null) {
         start.right.left = null;
       }
+      if(start.above == null && start.below == null && start.left == null && start.right == null){
+        System.out.println("All neighbors are nulll!!!!!");
+      }
+      if(start.above != null &&start.above.get_id() == GameObject.EMPTY_BLOCK_ID){
+        System.out.println("ABOVE are EMPTY BLOCKS!");
+      }
+      if(start.below != null && start.below.get_id() == GameObject.EMPTY_BLOCK_ID){
+        System.out.println("BELOW are EMPTY BLOCKS!");
+      }
+      if(start.left != null && start.left.get_id() == GameObject.EMPTY_BLOCK_ID ){
+        System.out.println("LEFT are EMPTY BLOCKS!");
+      }
+      if(start.right != null &&start.right.get_id() == GameObject.EMPTY_BLOCK_ID ){
+        System.out.println("RIGHT are EMPTY BLOCKS!");
+      }
       boolean u = isRooted(start.above, visitedUp);
       boolean d = isRooted(start.below, visitedDown);
       boolean l = isRooted(start.left, visitedLeft);
@@ -481,6 +539,7 @@ public class Grid {
         }
       }
       if(!(u&&d&&l&&r)){
+        System.out.println("Nothing will fall!");
       }
       blocks.get(x).set(y,new EmptyBlock(coordMap(x,y,blockSize)));
     }else{
@@ -572,17 +631,28 @@ public class Grid {
 
   public void loadSave(ArrayList<ArrayList<Block>> save){
     blocks.clear();
+    blockCount = 0;
     int value = 0;
     Block current;
+    ArrayList<Block> visited = new ArrayList<>();
     for(int i = 0; i < save.size();i++){
       blocks.add(new ArrayList<>());
       for(int j = 0; j < save.get(i).size(); j++){
         current = save.get(i).get(j);
         blocks.get(i).add(current);
-        current.setGrid(i,j);
         current.setPosition(coordMap(i,j,40));
+        current.setGrid(i,j);
+        if(isBlock(current)) {
+          blockCount++;
+        }
       }
     }
+    /*for(int i = 0; i < save.size();i++) {
+      for (int j = 0; j < save.get(i).size(); j++) {
+        if(isBlock(blocks.get(i).get(j))) {
+        }
+      }
+    }*/
     money -= brokenValue;
   }
 

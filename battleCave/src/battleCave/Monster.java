@@ -22,6 +22,7 @@ public class Monster extends Living {
   public boolean drawPath;
   private HealthBar h;
   private boolean showPathing;
+  public boolean killed;
   public Monster(float x, float y, Grid g, WeightManager w) {
     super(x, y, g);
     grid = g;
@@ -32,11 +33,12 @@ public class Monster extends Living {
     cachedPath = new ArrayList<>();
     weightManager = w;
     price = 10;
+    killed =false;
     b =false;
     live = true;
     setSpeed(.5f);
     setNoClimbing(true);
-    h = new HealthBar(-maxHealth/2.0f,-35,this);
+    h = new HealthBar(-25,-35,this);
   }
 
   public void keyHandler(int key, boolean pressed){
@@ -93,6 +95,9 @@ public class Monster extends Living {
         // Diagonal
         // Attack it stair case order.
         nextBlock.damage(1);
+        if(nextBlock.get_id() == GameObject.HOTBLOCK_ID){
+          damage(1);
+        }
         if(live) {
           if (nextBlock.below != null) {
             nextBlock.below.damage(1);
@@ -113,6 +118,9 @@ public class Monster extends Living {
       }
       if(next.getY() > getGridPos().getY()){
         up = false;
+        if(fly) {
+          down = true;
+        }
       }else if(next.getY() < getGridPos().getY()){
         if((int)next.getX() == (int)getGridPos().getX() && (target.isGrounded() || target.isClimbing())){
           // Change target to nearest block, this character can't go straight up.
@@ -237,5 +245,8 @@ public class Monster extends Living {
   }
   public void setShowPathing(boolean s){
     showPathing = s;
+  }
+  public void setKilled(){
+    killed = true;
   }
 }

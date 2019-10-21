@@ -38,10 +38,11 @@
 - **[33]** Finish the block selection menu.
 - **[34]** Add new blocks, most important, add a window that you can shoot through. blocks are basically useless without that.
 - **[35]** Make pathing info toggleable.
+- **[36]** Save grid info so when they die, the original structure appears again in the playing state.
+- **[37]** Add more kinds of enemies.
 
 PHASE 1 Grid - (Low bar Complete)
 PHASE 2 Players and Monsters
 PHASE 3 Finish everything else
-- **[36]** Save grid info so when they die, the original structure appears again in the playing state.
-- **[37]** Add more kinds of enemies.
+- **[38]** Make attack upgradable.
 

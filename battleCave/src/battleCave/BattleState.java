@@ -1,5 +1,6 @@
 package battleCave;
 
+import jig.ResourceManager;
 import jig.Vector;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -29,6 +30,7 @@ public class BattleState extends BasicGameState {
   public void enter(GameContainer container, StateBasedGame game) throws SlickException {
     bounces = 0;
     container.setSoundOn(true);
+    ResourceManager.getMusic(BounceGame.MUSIC_RSC).play();
     g = ((BounceGame)game).grid;
     itemPressed = false;
     clicked = false;
@@ -40,7 +42,7 @@ public class BattleState extends BasicGameState {
     for(int i = 0; i < g.blocks.size(); i++){
       blockSave.add(new ArrayList<>());
       for(Block b:g.blocks.get(i)){
-        blockSave.get(i).add(b);
+        blockSave.get(i).add(Grid.cloneBlock(b));
       }
     }
   }
@@ -97,10 +99,16 @@ public class BattleState extends BasicGameState {
   @Override
   public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
     Input input = container.getInput();
+    if(!ResourceManager.getMusic(BounceGame.MUSIC_RSC).playing()){
+      ResourceManager.getMusic(BounceGame.MUSIC_RSC).play();
+    }
     BounceGame bg = (BounceGame)game;
     if(clicked){
       bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
       clicked = false;
+    }
+    if(pressed){
+      bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
     }
     Vector temp1 = bg.creature.getGridPos();
     Vector temp2;
@@ -122,14 +130,8 @@ public class BattleState extends BasicGameState {
 		bg.items.update(delta);
 		bg.mmgr.update(delta);
 		if(bg.creature.getHealth() <= 0){
-		  bg.enterState(BounceGame.PLAYINGSTATE);
-		  for(ArrayList<Block> bks: blockSave){
-		    for(Block b: bks){
-		      b.heal();
-		      b.setActive(true);
-        }
-      }
       g.loadSave(blockSave);
+		  bg.enterState(BounceGame.PLAYINGSTATE);
     }
 
   }

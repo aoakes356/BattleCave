@@ -33,7 +33,7 @@ public class MonsterManager {
     grid.clickHandler(s1.getPosition(),1,GameObject.SPAWN_BLOCK_ID);
     grid.clickHandler(s2.getPosition(),1,GameObject.SPAWN_BLOCK_ID);
     elapsed = 0;
-    spawnRate = 10;
+    spawnRate = 20;
     target = null;
     showPathing = false;
   }
@@ -41,7 +41,15 @@ public class MonsterManager {
   public void addMonsters(){
     Monster newMonster;
     for(Vector v: spawnPoints){
-      newMonster = new Monster(v.getX(),v.getY(), grid, weights);
+      if(spawnRate%2 == 0) {
+        newMonster = new HellBat(v.getX(), v.getY(), grid, weights);
+        newMonster.setMaxHealth(newMonster.maxHealth+spawnRate);
+        newMonster.setHealth(newMonster.getMaxHealth());
+      }else{
+        newMonster = new Monster(v.getX(),v.getY(),grid,weights);
+        newMonster.setMaxHealth(newMonster.maxHealth+spawnRate);
+        newMonster.setHealth(newMonster.getMaxHealth());
+      }
       newMonster.setTarget(target);
       monsters.add(newMonster);
     }
@@ -60,6 +68,10 @@ public class MonsterManager {
         if(obj.get_id() == GameObject.PROJECTILE_ID){
           Projectile p = (Projectile)obj;
           m.setHealth(m.getHealth()-p.damage);
+          if(m.getHealth() < 0 && !m.killed){
+            m.setKilled();
+            ((Player)target).incrementKills();
+          }
           p.setActive(false);
         }
         return true;
@@ -70,9 +82,15 @@ public class MonsterManager {
 
   public void update(int delta){
     Monster m;
+    int tempSpawnRate;
     if(autoSpawn) {
       elapsed += delta;
-      if (elapsed >= 60000 / spawnRate) {
+      if(spawnRate > 200){
+        tempSpawnRate = 200;
+      }else{
+        tempSpawnRate = spawnRate;
+      }
+      if (elapsed >= 60000 /tempSpawnRate) {
         addMonsters();
         spawnRate++;
         elapsed = 0;

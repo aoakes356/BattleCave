@@ -49,7 +49,8 @@ public class BounceGame extends StateBasedGame {
 	public static final int PLAYINGSTATE = 1;
 	public static final int GAMEOVERSTATE = 2;
 	public static final int BATTLESTATE = 3;
-	
+  public static final String MUSIC_RSC = "battleCave/resource/gameSong.wav";
+
 	public static final String BALL_BALLIMG_RSC = "battleCave/resource/ball.png";
 	public static final String BALL_BROKENIMG_RSC = "battleCave/resource/brokenball.png";
 	public static final String GAMEOVER_BANNER_RSC = "battleCave/resource/GameOver.png";
@@ -71,6 +72,9 @@ public class BounceGame extends StateBasedGame {
   public static final String HOT_BLOCK_RSC = "battleCave/resource/HotBlock.png";
   public static final String HARD_BLOCK_RSC = "battleCave/resource/HardBlock.png";
   public static final String HARDEST_BLOCK_RSC = "battleCave/resource/HardestBlock.png";
+  public static final String HELL_BAT_RSC = "battleCave/resource/HellBat.png";
+  public static final String HEALTH_BUTTON_RSC = "battleCave/resource/HealthButton.png";
+  public static final String DAMAGE_BUTTON_RSC = "battleCave/resource/DamageButton.png";
 	public final int ScreenWidth;
 	public final int ScreenHeight;
 
@@ -83,6 +87,8 @@ public class BounceGame extends StateBasedGame {
 	public Player creature;
 	public MonsterManager mmgr;
 	public CaveButton battlebtn;
+  public healthButton hb;
+  public DamageButton db;
 	ArrayList<Bang> explosions;
 
 	/**
@@ -141,7 +147,11 @@ public class BounceGame extends StateBasedGame {
 		ResourceManager.loadImage(HOT_BLOCK_RSC);
 		ResourceManager.loadImage(HARD_BLOCK_RSC);
 		ResourceManager.loadImage(HARDEST_BLOCK_RSC);
+		ResourceManager.loadImage(HELL_BAT_RSC);
+    ResourceManager.loadImage(HEALTH_BUTTON_RSC);
+    ResourceManager.loadImage(DAMAGE_BUTTON_RSC);
 
+    ResourceManager.loadMusic(MUSIC_RSC);
     grid = new Grid(this,40);
     grid.setSelected(GameObject.EMPTY_BLOCK_ID);
 		ground = new Ground(ScreenWidth/2.0f,ScreenHeight-16);
@@ -154,7 +164,8 @@ public class BounceGame extends StateBasedGame {
     mmgr.setTarget(creature);
     weightMgr.setTarget(creature);
     battlebtn = new CaveButton(ScreenWidth-40,ScreenHeight-20);
-
+    hb = new healthButton(ScreenWidth-100,ScreenHeight-20,creature);
+    db = new DamageButton(ScreenWidth-135,ScreenHeight-20);
 	}
 
 	public static void main(String[] args) {

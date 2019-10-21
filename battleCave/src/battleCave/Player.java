@@ -12,18 +12,28 @@ public class Player extends Living {
   private Ground ground;
   private MonsterManager manager;
   private HealthBar health;
+  private int kills;
+  private int elapsed;
+  private int fireRate; // Shots per second;
+  public boolean shoots;
+  public int damage;
   public Player(float x, float y, Grid g, Ground grnd, MonsterManager m) {
     super(x, y, g);
     ground = grnd;
     manager = m;
     projectiles = new ArrayList<>();
+    kills = 0;
     setMaxHealth(150);
     setHealth(150);
-    health = new HealthBar(-getHealth()/2.0f,-35f,this);
+    health = new HealthBar(-25,-35f,this);
+    fireRate = 5;
+    shoots = true;
+    damage = 0;
   }
 
   public void attack(Vector dir){
     Projectile p = new Projectile(getX(),getY(),dir,1);
+    p.setDamage(p.getDamage()+kills+damage);
     projectiles.add(p);
   }
 
@@ -33,12 +43,20 @@ public class Player extends Living {
 
   public void clickHandler(int button, int x, int y){
     if(button == 0){
-      attack(new Vector(x,y).subtract(getPosition()));
+      if(shoots) {
+        attack(new Vector(x, y).subtract(getPosition()));
+        shoots = false;
+      }
     }
   }
 
   public void update(int delta){
     super.update(delta);
+    elapsed += delta;
+    if(elapsed >= 1000/fireRate){
+      shoots = true;
+      elapsed = 0;
+    }
     Projectile p;
     for(Iterator<Projectile> it = projectiles.iterator(); it.hasNext();){
       p = it.next();
@@ -67,6 +85,15 @@ public class Player extends Living {
     return GameObject.PLAYER_ID;
   }
 
+  public void incrementKills(){
+    kills++;
+  }
 
+  public void setDamage(int damage){
+    this.damage = damage;
+  }
 
+  public int getDamage(){
+    return damage;
+  }
 }
