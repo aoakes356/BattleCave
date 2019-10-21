@@ -12,8 +12,6 @@ public class Spawn extends Block {
   }
   public Spawn(float x, float y, float health, int gx, int gy) {
     super(x,y,health,gx,gy);
-    gridX = Grid.mapCoordX(x,40);
-    gridY = Grid.mapCoordY(y,40);
     removeImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
     addImage(ResourceManager.getImage(BounceGame.SPAWN_POINT_RSC));
     cost = 0;

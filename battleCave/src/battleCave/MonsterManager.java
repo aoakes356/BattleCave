@@ -89,8 +89,14 @@ public class MonsterManager {
     for(Vector v:spawnPoints){
       temp =grid.getAnyBlock(Grid.mapCoord(v.getX(),v.getY(),40));
       if(temp == null || temp.get_id() != GameObject.SPAWN_BLOCK_ID) {
-        grid.clickHandler(v,0,2);
-        grid.clickHandler(v,1,GameObject.SPAWN_BLOCK_ID);
+        if(grid.mode == Grid.BUILD_MODE) {
+          grid.clickHandler(v, 0, 2);
+          grid.clickHandler(v, 1, GameObject.SPAWN_BLOCK_ID);
+        }else{
+          int gx = Grid.mapCoordX(v.getX(), 40), gy = Grid.mapCoordY(v.getY(),40);
+          Spawn s1 = new Spawn(v,100,gx,gy);
+          grid.forceBlock(Grid.mapCoordX(v.getX(),40),Grid.mapCoordY(v.getY(),40),s1);
+        }
       }
     }
   }

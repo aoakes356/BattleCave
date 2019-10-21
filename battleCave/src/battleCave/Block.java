@@ -209,7 +209,7 @@ public class Block extends GameObject {
         Block temp3;
         while (c != null) {
           loops ++;
-          if(obj.get_id() == GameObject.BLOCK_ID || obj.get_id() == GameObject.SPAWN_BLOCK_ID){
+          if(Grid.isBlock(obj)){
             temp3 = (Block)obj;
             if(temp3.grounded && !grounded){
               translate(c.getMinPenetration().scale(.5f));

@@ -54,6 +54,14 @@ public class Grid {
     }
   }
 
+  public static boolean isBlock(GameObject obj){
+    int id = obj.get_id();
+    if(id == GameObject.SPAWN_BLOCK_ID || id == GameObject.BLOCK_ID){
+      return true;
+    }
+    return false;
+  }
+
   public boolean isAvailable(int x, int y){ // Check if a grid space contains part or all of a block.
     Vector gpos;
     for(ArrayList<Block> column: blocks){
@@ -94,7 +102,7 @@ public class Grid {
   }
 
   public void collision(GameObject obj){
-    if(obj.get_id() == GameObject.BLOCK_ID || obj.get_id() == GameObject.SPAWN_BLOCK_ID){
+    if(isBlock(obj)){
       Block temp = (Block)obj;
       if(!temp.getActive()){
         return;
