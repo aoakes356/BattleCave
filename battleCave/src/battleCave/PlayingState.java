@@ -1,5 +1,6 @@
 package battleCave;
 
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.Iterator;
 
 import jig.Vector;
@@ -22,6 +23,7 @@ import org.newdawn.slick.state.StateBasedGame;
 class PlayingState extends BasicGameState {
 	int bounces;
 	public Grid g;
+	public BounceGame bounceGame;
 	private boolean pressed;
 	private int button;
 	private boolean itemPressed;
@@ -39,6 +41,12 @@ class PlayingState extends BasicGameState {
 		g = ((BounceGame)game).grid;
 		itemPressed = false;
 		clicked = false;
+		bounceGame = (BounceGame)game;
+    bounceGame.grid.setMode(Grid.BUILD_MODE);
+    bounceGame.mmgr.setAutoSpawn(false);
+    bounceGame.mmgr.killAll();
+    bounceGame.creature.setHealth(bounceGame.creature.getMaxHealth());
+
 	}
 	@Override
 	public void render(GameContainer container, StateBasedGame game,
@@ -48,9 +56,10 @@ class PlayingState extends BasicGameState {
     bg.grid.render(g);
 		bg.ground.render(g);
 		bg.items.render(g);
+		bg.creature.render(g);
+		bg.mmgr.render(g);
+		bg.battlebtn.render(g);
 		g.drawString("Money: " + bg.grid.money, 10, 30);
-		for (Bang b : bg.explosions)
-			b.render(g);
 	}
 
 
@@ -60,11 +69,13 @@ class PlayingState extends BasicGameState {
 	  clickedX = x;
 	  clickedY = y;
 	  clickedButton = button;
+	  System.out.println("Mouse clicked: "+button);
   }
 
   @Override
   public void mousePressed(int button, int x, int y){
 	  super.mousePressed(button,x,y);
+	  System.out.println("Mouse pressed: "+button);
 	  pressed = true;
 	  this.button = button;
 
@@ -78,7 +89,14 @@ class PlayingState extends BasicGameState {
   public void keyPressed(int key, char c){
 	  if(key == Input.KEY_I){
 	    itemPressed = !itemPressed;
+    }else if(key == Input.KEY_ENTER){
+      bounceGame.enterState(BounceGame.BATTLESTATE);
     }
+    bounceGame.creature.keyHandler(key,true);
+  }
+
+  public void keyReleased(int key, char c){
+    bounceGame.creature.keyHandler(key,false);
   }
 
 
@@ -87,6 +105,7 @@ class PlayingState extends BasicGameState {
 			int delta) throws SlickException {
 		Input input = container.getInput();
 		BounceGame bg = (BounceGame)game;
+		bg.battlebtn.update(delta);
 		//bg.block.collision(bg.ground);
     if(pressed && !bg.items.isActive()){
       bg.grid.clickHandler(new Vector(container.getInput().getMouseX(),container.getInput().getMouseY()),button, bg.grid.getSelected());
@@ -98,15 +117,37 @@ class PlayingState extends BasicGameState {
     }else{
       bg.items.setActive(false);
     }
+    if(clicked){
+      bg.battlebtn.clickHandler(clickedX,clickedY,button,bg);
+     //bg.creature.clickHandler(button,input.getMouseX(),input.getMouseY());
+    }
     if(bg.items.isActive() && clicked){
       bg.items.clickHandler(clickedButton,clickedX,clickedY);
       clicked = false;
+    }else if(clicked){
+      bg.grid.clickHandler(new Vector(clickedX,clickedY),button,bg.grid.getSelected());
+      clicked = false;
     }
+    Vector temp1 = bg.creature.getGridPos();
+    Vector temp2;
     bg.grid.setSelected(bg.items.selected);
 		bg.grid.collision(bg.ground);
 		bg.grid.update(delta);
+		bg.creature.update(delta);
+    bg.creature.gridCollision(bg.grid,bg.ground);
+    if(bg.creature.getPosition().getX() > bg.ScreenWidth-10){
+      bg.creature.setX(bg.ScreenWidth-10);
+    }if(bg.creature.getPosition().getY() > bg.ScreenHeight-10){
+      bg.creature.setY(bg.ScreenHeight-10);
+    }
+    temp2 = bg.creature.getGridPos();
+    if(temp1.getX() != temp2.getX() || temp1.getY() != temp2.getY() || bg.grid.changed){
+      bg.weightMgr.generatePath();
+      bg.grid.setChanged(false);
+    }
 		bg.grid.collisionCheck();
 		bg.items.update(delta);
+		bg.mmgr.update(delta);
 
 		//bg.block.update(delta);
 

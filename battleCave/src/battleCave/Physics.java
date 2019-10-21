@@ -8,6 +8,7 @@ public class Physics {
   public PhysVector acceleration;
   public PhysVector force;
   public float mass;
+  public float maxAcceleration;
 
   public Physics(){
     this(0,0,0);
@@ -23,6 +24,7 @@ public class Physics {
     velocity = new PhysVector(vx,vy);
     acceleration = new PhysVector(0,0);
     force = new PhysVector(0,0);
+    maxAcceleration = 300f;
     this.mass = mass;
   }
 
@@ -45,11 +47,21 @@ public class Physics {
   public void addAcceleration(Vector v){
     acceleration.add(v.getX(),v.getY());
   }
+  public void setMaxAcceleration(float acceleration){
+    maxAcceleration = acceleration;
+  }
 
+  public void setVelocity(PhysVector v){
+    velocity = v;
+  }
 
   public void update(int delta){
     acceleration.add(force.x/mass,force.y/mass);
     acceleration.scale(delta);
+    float length = acceleration.length();
+    if(length > maxAcceleration){
+      acceleration.scale(maxAcceleration/length);
+    }
     velocity.add(acceleration);
     force.x = 0;
     force.y = 0;

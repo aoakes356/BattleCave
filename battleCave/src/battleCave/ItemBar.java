@@ -2,62 +2,59 @@ package battleCave;
 
 import jig.Entity;
 import jig.ResourceManager;
+import jig.Shape;
 import jig.Vector;
 import org.newdawn.slick.Graphics;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 public class ItemBar extends Entity {
   private boolean active;
-  private ArrayList<Integer> items;   // Contains items to be displayed
-  private ArrayList<Vector> coords;   // (relative)Coordinates to the square in which the items are shown.
   public int selected;
+  private int buttonCount;
+  private ArrayList<ItemButton> buttons;
   public ItemBar(BounceGame bg){
     super(bg.ScreenWidth/2f, bg.ScreenHeight/1.5f);
-    coords = new ArrayList<>();
-    coords.add(new Vector(-100,-70));
+    addImageWithBoundingBox(ResourceManager.getImage(BounceGame.EMPTY_MENU_RSC));
     active = false;
-    items = new ArrayList<>();
-    items.add(GameObject.BLOCK_ID);
+    buttons = new ArrayList<>();
+    buttonCount = 0;
+    addItem(GameObject.BLOCK_ID,BounceGame.BASIC_BLOCK_RSC);
+    addItem(GameObject.WINDOW_ID,BounceGame.WINDOW_BLOCK_RSC);
+    addItem(GameObject.HOTBLOCK_ID,BounceGame.HOT_BLOCK_RSC);
+    addItem(GameObject.HARDBLOCK_ID,BounceGame.HARD_BLOCK_RSC);
+    addItem(GameObject.HARDESTBLOCK_ID, BounceGame.HARDEST_BLOCK_RSC);
     selected = GameObject.EMPTY_BLOCK_ID;
-    addImage(ResourceManager.getImage(BounceGame.EMPTY_MENU_RSC));
   }
 
   public void update(int delta){
     if(active){
-
+      for(ItemButton b: buttons){
+        b.update(delta);
+      }
     }
   }
 
   public void render(Graphics g){
     if(active) {
       super.render(g);
+      for(ItemButton b: buttons){
+        b.render(g);
+      }
     }
 
   }
 
   public void clickHandler(int button, int x, int y){
-    Vector relative = new Vector(x,y).subtract(getPosition());
-    System.out.println("Relative click coordinates: "+relative.getX()+", "+relative.getY());
-    if(Math.abs(relative.getX()) > 130 || Math.abs(relative.getY()) > 100){
-      return;
-    }
-    Vector dist;
-    int count = 0;
-    int id = -1;
-    for(Vector v: coords){
-      dist = v.subtract(relative);
-      if(Math.abs(dist.getX()) < 20 && Math.abs(dist.getY()) < 20){
-        // That is the box that was clicked.
-        id = items.get(count);
+    for(ItemButton b: buttons){
+      b.clickHandler(x,y,button);
+      if(b.clicked){
+        selected = b.id;
+        b.clicked = false;
       }
-      count++;
     }
-    if(id != -1){
-      selected = id;
-      System.out.println("new block selected.");
-    }
-    System.out.println("The click is in the box.");
+
   }
 
   public boolean isActive() {
@@ -68,12 +65,21 @@ public class ItemBar extends Entity {
     this.active = active;
   }
 
-  public void addItem(int id, Vector relativeCoords){
-    if(!items.contains(id)) {
-      items.add(id);
-      coords.add(relativeCoords);
-    }
+  public Vector calculateButtonPos(){
+    int gridX = buttonCount%5;
+    int gridY = buttonCount/5;
+    Shape s = getShapes().get(0);
+    float relX = getX()-s.getMaxX();
+    float relY = getY()-s.getMaxY();
+    return new Vector(gridX*50+relX+30,gridY*50+relY+30);
+  }
 
+  public void addItem(int id, String image){
+    Vector nextPos = calculateButtonPos();
+    ItemButton b = new ItemButton(nextPos.getX(),nextPos.getY(),id);
+    b.setCurrentImage(image);
+    buttons.add(b);
+    buttonCount++;
   }
 
 }

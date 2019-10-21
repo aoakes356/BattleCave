@@ -1,6 +1,7 @@
 package battleCave;
 
 import jig.Vector;
+import org.lwjgl.Sys;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -24,9 +25,12 @@ public class Grid {
   public int money;
   private int selected;
   private ArrayList<Cluster> chunks;
+  private int blockCount;
+  public boolean changed;
   public Grid(BounceGame bg,int blockSize){
     this.blockSize = blockSize;
-    money = 10000;
+    money = 150;
+    blockCount = 0;
     blocks = new ArrayList<>();
     mode = BUILD_MODE;
     width = bg.ScreenWidth/blockSize;
@@ -36,21 +40,26 @@ public class Grid {
     ArrayList<Block> temp;
     chunks = new ArrayList<>();
     pressed = false;
-    int blockcount = 0;
-    int duplicates = 0;
-    float x, y;
+    changed = true;
     for(int i = 0; i < width; i++){
       temp = new ArrayList<>();
       blocks.add(temp);
       for(int j = 0; j < height; j++){
         temp.add(new EmptyBlock(coordMap(i,j,blockSize)));
-        blockcount++;
         /*x = i*40+20;
         y = j*40+20;
         temp.add(new Block(x,y,100,i,j));*/
       }
 
     }
+  }
+
+  public static boolean isBlock(GameObject obj){
+    int id = obj.get_id();
+    if(id == GameObject.SPAWN_BLOCK_ID || id == GameObject.BLOCK_ID || id == GameObject.WINDOW_ID || id == GameObject.HOTBLOCK_ID || id == GameObject.HARDBLOCK_ID || id == GameObject.HARDESTBLOCK_ID){
+      return true;
+    }
+    return false;
   }
 
   public boolean isAvailable(int x, int y){ // Check if a grid space contains part or all of a block.
@@ -93,7 +102,7 @@ public class Grid {
   }
 
   public void collision(GameObject obj){
-    if(obj.get_id() == GameObject.BLOCK_ID){
+    if(isBlock(obj)){
       Block temp = (Block)obj;
       if(!temp.getActive()){
         return;
@@ -138,11 +147,17 @@ public class Grid {
   public void update(int delta){
     Block temp;
     int previous;
+    ArrayList<Cluster> clusters;
     ArrayList<Block> visited = new ArrayList<>();
     for(int i = 0; i < this.blocks.size(); i++){
       for(int j = 0; j < this.blocks.get(i).size(); j++){
         temp = (this.blocks.get(i)).get(j);
-        if(temp != null) {
+        if(!temp.getActive()){
+          clusters = destroyBlock(temp.gridX,temp.gridY);
+          if(clusters != null){
+            chunks.addAll(clusters);
+          }
+        }else if(temp != null) {
           previous = temp.gridY;
           temp.update(delta);
           if (temp.gridX < width && temp.gridY < height) {
@@ -169,7 +184,7 @@ public class Grid {
       }
     }
     if(chunks.size() > 0){
-      System.out.println("falling chunks.");
+      changed = true;
     }
   }
 
@@ -217,6 +232,7 @@ public class Grid {
         return;
       }
       ArrayList<Cluster> clusters;
+      System.out.println("Button: " +button);
       if (button == 1) {
         activateBlock((int) e.getX(), (int) e.getY(), id);
       } else if (button == 0) {
@@ -246,9 +262,6 @@ public class Grid {
     return new Vector(x,y);
   }
 
-  public static void settle(Block b, int blockSize){
-    b.setPosition(coordMap(b.gridX,b.gridY,blockSize));
-  }
 
   public static float coordMapX(int x, int blockSize){
     return x*blockSize+blockSize/2;
@@ -273,20 +286,32 @@ public class Grid {
   public void activateBlock(int x, int y, int id){
     Block temp;
     temp = this.blocks.get(x).get(y);
-    if((temp == null || temp.get_id() != id)&&isAvailable(x,y)){
+    if((temp == null || !isBlock(temp))&&isAvailable(x,y)){
       Block nblock;
       if(id == GameObject.BLOCK_ID) {
         nblock = new Block(x, y, 100);
       }else if(id == GameObject.EMPTY_BLOCK_ID){
         nblock = new EmptyBlock(coordMap(x,y,40));
-      }else{
+      }else if(id == GameObject.SPAWN_BLOCK_ID){
+        nblock = new Spawn(coordMap(x,y,40),100,x,y);
+      }else if(id == GameObject.WINDOW_ID){
+        nblock = new WindowBlock(coordMap(x,y,40),100,x,y);
+      }else if(id == GameObject.HOTBLOCK_ID){
+        nblock = new HotBlock(coordMap(x,y,40),100,x,y);
+      }else if(id == GameObject.HARDBLOCK_ID){
+        nblock = new HardBlock(coordMap(x,y,40),100,x,y);
+      } else if (id == GameObject.HARDESTBLOCK_ID) {
+        nblock = new HardestBlock(coordMap(x,y,40),100,x,y);
+      } else {
         nblock = new Block(x, y, 100);
       }
-      if(money - nblock.cost >= 0) {
+      if(money - nblock.cost >= 0 && blockCount <= 500) {
         this.blocks.get(x).set(y, nblock);
         this.blocks.get(x).get(y).setActive(true);
         findNeighbors(nblock);
         money -= nblock.cost;
+        blockCount++;
+        changed = true;
       }
 
     }
@@ -374,6 +399,8 @@ public class Grid {
     ArrayList<Cluster> clusters = null;
     if(start != null && start.get_id() != GameObject.EMPTY_BLOCK_ID){
       money += start.cost;
+      blockCount--;
+      changed = true;
       ArrayList<Block> visitedUp = new ArrayList<>();
       ArrayList<Block> visitedDown = new ArrayList<>();
       ArrayList<Block> visitedLeft = new ArrayList<>();
@@ -476,6 +503,30 @@ public class Grid {
     mode = m;
   }
 
+  public Block getAnyBlock(Vector v){
+    return getAnyBlock((int)v.getX(),(int)v.getY());
+  }
+
+  public Block getAnyBlock(int x, int y){
+    if(x < blocks.size() && y < blocks.get(x).size()) {
+      Block temp = blocks.get(x).get(y);
+      return temp;
+    }
+    return null;
+  }
+
+  public Block getBlock(int x, int y){
+    if(x < blocks.size() && y < blocks.get(x).size()) {
+      Block temp = blocks.get(x).get(y);
+      if(temp.get_id() != GameObject.EMPTY_BLOCK_ID){
+        return temp;
+      }else{
+        return null;
+      }
+    }
+    return null;
+  }
+
   public int getSelected() {
     return selected;
   }
@@ -483,4 +534,33 @@ public class Grid {
   public void setSelected(int selected) {
     this.selected = selected;
   }
+
+  public void setChanged(boolean change){
+    changed = change;
+  }
+  public void forceBlock(int x, int y, Block b){
+    if(x < width && x > 0 && y < height && y > 0) {
+      blocks.get(x).set(y, b);
+    }
+  }
+
+  public Block getNearestBlock(Vector pos){
+    float dist;
+    float min = 10000000;
+    Block nearest = null;
+    for(ArrayList<Block> column: blocks){  // Naive approach for now.
+      for(Block b: column) {
+        if (b.get_id() != GameObject.EMPTY_BLOCK_ID && b.get_id() != GameObject.SPAWN_BLOCK_ID) {
+          dist = b.getGridPos().subtract(pos).length();
+          if (dist < min && ((nearest == null) || nearest.getY() < b.getY())) {
+            min = dist;
+            nearest = b;
+          }
+        }
+      }
+    }
+    return nearest;
+  }
+
+
 }

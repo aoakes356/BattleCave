@@ -23,8 +23,25 @@
 - **[19]** Add an inventory system - when a block is added subtract from inventory
            when block is broken, add it to inventory(decided to go with cost based rather than item based).
 - **[20]** Add a material selection bar.
-
-PHASE 1 Grid
 - **[21]** Fix bug that causes blocks to overlap after collisions sometimes.
+- **[22]** Implement a super class that will be extended by player and monster classes.
+- **[23]** Implement player class, make basic art.
+- **[24]** Implement a Monster class, make basic art.
+- **[25]** make target weights independent from monsters, make monsters follow path.
+- **[26]** Add a battle state.
+- **[27]** Get money from slaying the enemy.
+- **[28]** Take damage from the enemy when they are close enough.
+- **[29]** Add a way to transition between battle and building state(a button or something.).
+- **[30]** upon death, enter back into the building state with the newly acquired funds.
+- **[31]** Make spawn points impossible to occupy with other blocks.
+- **[32]** Make enemies and players get squashed by falling blocks. damage is dependent on cluster size?.
+- **[33]** Finish the block selection menu.
+- **[34]** Add new blocks, most important, add a window that you can shoot through. blocks are basically useless without that.
+- **[35]** Make pathing info toggleable.
+
+PHASE 1 Grid - (Low bar Complete)
 PHASE 2 Players and Monsters
-PHASE 3 Menus
+PHASE 3 Finish everything else
+- **[36]** Save grid info so when they die, the original structure appears again in the playing state.
+- **[37]** Add more kinds of enemies.
+

@@ -3,6 +3,7 @@ package battleCave;
 import jig.Collision;
 import jig.ResourceManager;
 import jig.Vector;
+import org.lwjgl.Sys;
 import org.newdawn.slick.Game;
 import org.newdawn.slick.Graphics;
 
@@ -88,7 +89,7 @@ public class Block extends GameObject {
       this.gridY = (int) pos.getY();
       if (grounded) {
         // Keep in its grid position.
-        if(currentImage != BounceGame.STATIC_BLOCK_RSC) {
+        if(currentImage != BounceGame.STATIC_BLOCK_RSC && get_id() == GameObject.BLOCK_ID) {
           removeImage(ResourceManager.getImage(currentImage));
           addImage(ResourceManager.getImage(BounceGame.STATIC_BLOCK_RSC));
           currentImage = BounceGame.STATIC_BLOCK_RSC;
@@ -104,9 +105,13 @@ public class Block extends GameObject {
         super.physics.velocity.scale(0);
         super.physics.acceleration.scale(0);
         super.physics.force.scale(0);
-        super.update(delta);
+        if(currentImage != BounceGame.BASIC_BLOCK_RSC && get_id() == GameObject.BLOCK_ID) {
+          removeImage(ResourceManager.getImage(currentImage));
+          addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
+          currentImage = BounceGame.BASIC_BLOCK_RSC;
+        }
       }else {
-        if(currentImage != BounceGame.BASIC_BLOCK_RSC) {
+        if(currentImage != BounceGame.BASIC_BLOCK_RSC && get_id() == GameObject.BLOCK_ID) {
           removeImage(ResourceManager.getImage(currentImage));
           addImage(ResourceManager.getImage(BounceGame.BASIC_BLOCK_RSC));
           currentImage = BounceGame.BASIC_BLOCK_RSC;
@@ -186,9 +191,10 @@ public class Block extends GameObject {
     }*/
     Collision c = collides(obj);
     boolean collide = true;
+    int loops = 0;
     if(obj != this) {
       if (c != null) {
-        if (obj.get_id() == GameObject.GROUND_ID || obj.get_id() == GameObject.BLOCK_ID) {
+        if (obj.get_id() == GameObject.GROUND_ID || Grid.isBlock(obj)) {
           if(obj.get_id() == GameObject.GROUND_ID){
             grounded = true;
             rooted = true;
@@ -202,7 +208,8 @@ public class Block extends GameObject {
         }
         Block temp3;
         while (c != null) {
-          if(obj.get_id() == GameObject.BLOCK_ID){
+          loops ++;
+          if(Grid.isBlock(obj)){
             temp3 = (Block)obj;
             if(temp3.grounded && !grounded){
               translate(c.getMinPenetration().scale(.5f));
@@ -212,18 +219,26 @@ public class Block extends GameObject {
               c = collides(obj);
             }else{
               if(!isStatic && temp3.isStatic){
-                temp3.translate(c.getMinPenetration().scale(-.5f));
+                translate(c.getMinPenetration().scale(.01f));
+                c = collides(obj);
+              }else if(grounded && temp3.grounded){
+                translate(c.getMinPenetration().scale(.01f));
+                c = collides(obj);
+              }else if(!grounded && !temp3.grounded){
+                translate(c.getMinPenetration().scale(.01f));
                 c = collides(obj);
               }else{
-                translate(c.getMinPenetration().scale(.5f));
-                c = collides(obj);
+                c = null;
               }
             }
           }else if(grounded) {
-            translate(c.getMinPenetration().scale(.5f));
+            translate(c.getMinPenetration().scale(.01f));
             c = collides(obj);
           }else{
             c = null;
+          }
+          if(loops > 100){
+            break;
           }
         }
       }
@@ -278,8 +293,25 @@ public class Block extends GameObject {
     hasCluster = cluster;
   }
 
+  public boolean isStatic(){
+    return isStatic;
+  }
+
+  public void damage(int damage){
+    health -= damage;
+    if(get_id() != GameObject.EMPTY_BLOCK_ID){
+      if(health < 0){
+        health = 0;
+        active = false;
+      }
+    }
+  }
+
   @Override
   public int get_id(){
     return GameObject.BLOCK_ID;
+  }
+  public Vector getGridPos(){
+    return new Vector(gridX,gridY);
   }
 }
